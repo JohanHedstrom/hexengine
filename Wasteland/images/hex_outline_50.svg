@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg4051"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   width="87"
+   height="100"
+   sodipodi:docname="hex_outline_50.svg">
+  <metadata
+     id="metadata4057">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4055">
+    <filter
+       inkscape:label="Feather"
+       inkscape:menu="ABCs"
+       inkscape:menu-tooltip="Blurred mask on the edge without altering the contents"
+       color-interpolation-filters="sRGB"
+       id="filter2990">
+      <feGaussianBlur
+         result="result6"
+         stdDeviation="0.40000000000000002"
+         id="feGaussianBlur2992" />
+      <feComposite
+         in2="result6"
+         operator="atop"
+         in="SourceGraphic"
+         result="result91"
+         id="feComposite2994" />
+      <feComposite
+         operator="in"
+         in2="result91"
+         result="result92"
+         id="feComposite2996" />
+      <feComposite
+         operator="in"
+         in2="result92"
+         id="feComposite2998" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1600"
+     inkscape:window-height="1138"
+     id="namedview4053"
+     showgrid="false"
+     inkscape:zoom="9.44"
+     inkscape:cx="23.107048"
+     inkscape:cy="53.472031"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4051" />
+  <path
+     sodipodi:type="star"
+     style="fill:none;stroke:#005900;stroke-width:2.65604305000000010;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter2990)"
+     id="path4061"
+     sodipodi:sides="6"
+     sodipodi:cx="36.864407"
+     sodipodi:cy="40.677967"
+     sodipodi:r1="43.64407"
+     sodipodi:r2="37.796871"
+     sodipodi:arg1="1.5707963"
+     sodipodi:arg2="2.0943951"
+     inkscape:flatsided="true"
+     inkscape:rounded="0"
+     inkscape:randomized="0"
+     d="M 36.864408,84.322037 -0.93246589,62.500003 -0.93246706,18.855933 36.864405,-2.9661026 74.661279,18.855931 l 1e-6,43.64407 z"
+     transform="matrix(1.1373002,0.00451579,2.214352e-4,1.1340016,1.6491711,3.6832797)"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90"
+     inkscape:export-filename="C:\Users\johan\Google Drive\corona\wasteland\images\hex_outline_selected.png" />
+</svg>

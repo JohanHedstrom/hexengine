@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg4051"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   width="87"
+   height="100"
+   sodipodi:docname="player.svg"
+   inkscape:export-filename="C:\Users\johan\Google Drive\corona\wasteland\images\player.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <metadata
+     id="metadata4057">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4055">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="89.100039 : 17.56368 : 1"
+       inkscape:vp_y="-629.68897 : -776.84735 : 0"
+       inkscape:vp_z="21.51432 : 72.34662 : 1"
+       inkscape:persp3d-origin="65.801996 : 57.902606 : 1"
+       id="perspective4287" />
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1600"
+     inkscape:window-height="1138"
+     id="namedview4053"
+     showgrid="false"
+     inkscape:zoom="26.700352"
+     inkscape:cx="33.315559"
+     inkscape:cy="54.582128"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4051" />
+  <g
+     transform="matrix(1.9375605,0,0,1.854284,-18.180412,-50.22695)"
+     id="g4361">
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path4335"
+       d="m 52.740558,45.770241 -0.105526,14.618644 c -3.015275,4.972157 -12.47992,4.912181 -14.984764,0 l 0.105526,-14.830509 z"
+       style="fill:#c8ab37;fill-opacity:1;stroke:#000000;stroke-width:0.99808323;stroke-opacity:1" />
+    <path
+       transform="matrix(1,0,0,0.73831775,0,10.866466)"
+       d="m 52.86017,47.192795 c 0,3.130003 -3.414777,5.667373 -7.627119,5.667373 -4.212341,0 -7.627118,-2.53737 -7.627118,-5.667373 0,-3.130004 3.414777,-5.667373 7.627118,-5.667373 4.212342,0 7.627119,2.537369 7.627119,5.667373 z"
+       sodipodi:ry="5.6673727"
+       sodipodi:rx="7.6271186"
+       sodipodi:cy="47.192795"
+       sodipodi:cx="45.233051"
+       id="path4331-7"
+       style="fill:#c8ab37;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+       sodipodi:type="arc" />
+  </g>
+  <g
+     id="g4445"
+     transform="matrix(1,0,0,1.0113072,1.2733914,11.664205)"
+     inkscape:export-filename="C:\Users\johan\Google Drive\corona\wasteland\images\enemy.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90">
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:connector-curvature="0"
+       id="path4397"
+       d="M 25.912703,21.734024 C 22.622145,26.313991 20.925885,30.745822 18.97212,35.325789 38.810424,29.848071 28.570557,33.417932 42.659959,28.311385 38.028074,25.648978 32.128895,23.613134 25.912703,21.734024 z"
+       style="fill:#a02c2c;stroke:#000000;stroke-width:0.99714005;stroke-opacity:1" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path4437"
+       d="m 18.543523,36.400264 c -0.605605,4.26804 -0.614415,4.374511 -0.02193,8.101499 l 25.039136,-7.581644 c 1.123581,-5.074083 -0.07491,-8.025002 -0.07491,-8.025002 -5.782704,0.487057 -17.295835,4.215595 -24.9423,7.505147 z"
+       style="fill:#a02c2c;fill-opacity:1;stroke:#000000;stroke-width:0.96143717px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  </g>
+</svg>

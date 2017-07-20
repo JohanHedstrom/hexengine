@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg4051"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   width="87"
+   height="100"
+   sodipodi:docname="ui_move_to_player.svg"
+   inkscape:export-filename="C:\Users\johan\Google Drive\corona\wasteland\images\player.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <metadata
+     id="metadata4057">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4055">
+    <linearGradient
+       id="linearGradient5262"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop5264" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="89.100039 : 17.56368 : 1"
+       inkscape:vp_y="-629.68897 : -776.84735 : 0"
+       inkscape:vp_z="21.51432 : 72.34662 : 1"
+       inkscape:persp3d-origin="65.801996 : 57.902606 : 1"
+       id="perspective4287" />
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1019"
+     id="namedview4053"
+     showgrid="false"
+     inkscape:zoom="2.36"
+     inkscape:cx="37.422276"
+     inkscape:cy="50.829931"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4051" />
+  <text
+     xml:space="preserve"
+     style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+     x="13.559322"
+     y="11.016949"
+     id="text2988"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan2990"
+       x="13.559322"
+       y="11.016949"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;font-family:Sans;-inkscape-font-specification:Sans" /></text>
+  <g
+     id="g5280"
+     inkscape:export-filename="C:\Backup\Projekt\corona\wasteland\images\ui_move_to_player.png"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90">
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       ry="13.336228"
+       y="29.700108"
+       x="6.015521"
+       height="54.76366"
+       width="97.863968"
+       id="rect3790"
+       style="fill:#668000;fill-opacity:1;stroke:#1d3828;stroke-width:3.27725147999999990;stroke-linecap:butt;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <g
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\Backup\Projekt\corona\wasteland\images\player.png"
+       id="g4361-0"
+       transform="matrix(1.5219373,0,0,1.537299,5.8307734,-25.149775)">
+      <path
+         style="fill:#c8ab37;fill-opacity:1;stroke:#000000;stroke-width:0.99808323;stroke-opacity:1"
+         d="m 52.740558,45.770241 -0.105526,14.618644 c -3.015275,4.972157 -12.47992,4.912181 -14.984764,0 l 0.105526,-14.830509 z"
+         id="path4335-9"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         sodipodi:type="arc"
+         style="fill:#c8ab37;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+         id="path4331-7-4"
+         sodipodi:cx="45.233051"
+         sodipodi:cy="47.192795"
+         sodipodi:rx="7.6271186"
+         sodipodi:ry="5.6673727"
+         d="m 52.86017,47.192795 c 0,3.130003 -3.414777,5.667373 -7.627119,5.667373 -4.212341,0 -7.627118,-2.53737 -7.627118,-5.667373 0,-3.130004 3.414777,-5.667373 7.627118,-5.667373 4.212342,0 7.627119,2.537369 7.627119,5.667373 z"
+         transform="matrix(1,0,0,0.73831775,0,10.866466)" />
+    </g>
+    <path
+       sodipodi:nodetypes="cccccccc"
+       inkscape:connector-curvature="0"
+       id="path3816"
+       d="M 59.423747,57.106142 C 54.580817,51.758219 48.924489,46.610211 42.638267,41.617029 l 0.303556,10.736837 c -7.505303,-1.372098 -14.382907,-0.892809 -21.17637,-0.165374 -1.360127,3.129911 -1.163332,6.478495 2.1e-5,9.962828 6.999891,0.921317 14.175116,0.808646 21.535978,-0.399232 l -0.135357,10.869915 c 5.526744,-5.645607 11.01847,-11.064606 16.257652,-15.515867 z"
+       style="fill:#008000;fill-opacity:1;stroke:#000000;stroke-width:1.26697385px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  </g>
+</svg>

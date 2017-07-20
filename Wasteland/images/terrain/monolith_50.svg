@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg4051"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   width="87"
+   height="100"
+   sodipodi:docname="monolith_50.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1600"
+     inkscape:window-height="1139"
+     id="namedview4053"
+     showgrid="false"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="38.857294"
+     inkscape:cy="72.863336"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <metadata
+     id="metadata4057">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4055">
+    <filter
+       id="filter2990"
+       color-interpolation-filters="sRGB"
+       inkscape:menu-tooltip="Blurred mask on the edge without altering the contents"
+       inkscape:menu="ABCs"
+       inkscape:label="Feather">
+      <feGaussianBlur
+         id="feGaussianBlur2992"
+         stdDeviation="0.40000000000000002"
+         result="result6" />
+      <feComposite
+         id="feComposite2994"
+         result="result91"
+         in="SourceGraphic"
+         operator="atop"
+         in2="result6" />
+      <feComposite
+         id="feComposite2996"
+         result="result92"
+         in2="result91"
+         operator="in" />
+      <feComposite
+         id="feComposite2998"
+         in2="result92"
+         operator="in" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3978"
+       x="-0.13611936"
+       width="1.2722387"
+       y="-0.26563532"
+       height="1.5312706">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.85901769"
+         id="feGaussianBlur3980" />
+    </filter>
+  </defs>
+  <g
+     style="display:none"
+     inkscape:label="background"
+     id="layer1"
+     inkscape:groupmode="layer">
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       d="M 36.864408,84.322037 -0.93246589,62.500003 -0.93246706,18.855933 36.864405,-2.9661026 74.661279,18.855931 l 1e-6,43.64407 z"
+       inkscape:randomized="0"
+       inkscape:rounded="0"
+       inkscape:flatsided="true"
+       sodipodi:arg2="2.0943951"
+       sodipodi:arg1="1.5707963"
+       sodipodi:r2="37.796871"
+       sodipodi:r1="43.64407"
+       sodipodi:cy="40.677967"
+       sodipodi:cx="36.864407"
+       sodipodi:sides="6"
+       id="path4061"
+       style="color:#000000;fill:#9f9f9f;fill-opacity:1;fill-rule:nonzero;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       sodipodi:type="star"
+       inkscape:export-filename="C:\Backup\Projekt\corona\wasteland\images\terrain\monolith_behind_50.png"
+       transform="matrix(1.1533227,0.00454729,2.2455485e-4,1.1419115,1.0583794,3.3853182)" />
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       d="M 36.864408,84.322037 -0.93246589,62.500003 -0.93246706,18.855933 36.864405,-2.9661026 74.661279,18.855931 l 1e-6,43.64407 z"
+       inkscape:randomized="0"
+       inkscape:rounded="0"
+       inkscape:flatsided="true"
+       sodipodi:arg2="2.0943951"
+       sodipodi:arg1="1.5707963"
+       sodipodi:r2="37.796871"
+       sodipodi:r1="43.64407"
+       sodipodi:cy="40.677967"
+       sodipodi:cx="36.864407"
+       sodipodi:sides="6"
+       id="path4061-0"
+       style="color:#000000;fill:none;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       sodipodi:type="star"
+       inkscape:export-filename="C:\Backup\Projekt\corona\wasteland\images\terrain\monolith_behind_50.png"
+       transform="matrix(3.1251333,0.01232169,6.0847137e-4,3.0942126,-71.646866,-76.316922)" />
+  </g>
+  <g
+     style="display:none"
+     sodipodi:insensitive="true"
+     inkscape:label="border"
+     id="layer5"
+     inkscape:groupmode="layer">
+    <path
+       inkscape:export-filename="C:\Users\johan\Google Drive\corona\wasteland\images\hex_outline_selected.png"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       transform="matrix(1.1373002,0.00451579,2.214352e-4,1.1340016,1.6032314,3.8105808)"
+       d="M 36.864408,84.322037 -0.93246589,62.500003 -0.93246706,18.855933 36.864405,-2.9661026 74.661279,18.855931 l 1e-6,43.64407 z"
+       inkscape:randomized="0"
+       inkscape:rounded="0"
+       inkscape:flatsided="true"
+       sodipodi:arg2="2.0943951"
+       sodipodi:arg1="1.5707963"
+       sodipodi:r2="37.796871"
+       sodipodi:r1="43.64407"
+       sodipodi:cy="40.677967"
+       sodipodi:cx="36.864407"
+       sodipodi:sides="6"
+       id="path4061-1"
+       style="fill:none;stroke:#005900;stroke-width:2.65604305;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter2990)"
+       sodipodi:type="star" />
+  </g>
+  <g
+     style="display:inline"
+     inkscape:label="behind"
+     id="layer2"
+     inkscape:groupmode="layer">
+    <path
+       style="fill:#cccccc;stroke:#333333;stroke-width:0.69999999;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 18.381027,53.643847 41.914391,71.56099 68.763483,56.058216 44.591842,-72.158471 l -1.753969,3.234256 -5.773938,-1.935315 z"
+       id="path3811"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="C:\Backup\Projekt\corona\wasteland\images\terrain\monolith_behind_50.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#f2f2f2;stroke:#333333;stroke-width:0.69999999;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 37.115261,-70.831578 3.283774,-2.656287 4.190107,1.250699 -2.28179,2.973854 z"
+       id="path3813"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="C:\Backup\Projekt\corona\wasteland\images\terrain\monolith_behind_50.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#999999;stroke:#333333;stroke-width:0.69999999;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 42.242939,-69.339701 41.92548,71.561049 68.800584,56.053381 44.512095,-72.049666 z"
+       id="path3815"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="C:\Backup\Projekt\corona\wasteland\images\terrain\monolith_behind_50.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#f2f2f2;fill-opacity:1;stroke:#333333;stroke-width:0.69999999;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path3817"
+       sodipodi:cx="43.310291"
+       sodipodi:cy="-73.948265"
+       sodipodi:rx="4.4194174"
+       sodipodi:ry="4.5961943"
+       d="m 47.729709,-73.948265 a 4.4194174,4.5961943 0 1 1 -8.838835,0 4.4194174,4.5961943 0 1 1 8.838835,0 z"
+       transform="translate(-2.4748737,-2.1213203)"
+       inkscape:export-filename="C:\Backup\Projekt\corona\wasteland\images\terrain\monolith_behind_50.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+  </g>
+  <g
+     style="display:none"
+     sodipodi:insensitive="true"
+     inkscape:label="middle"
+     id="layer3"
+     inkscape:groupmode="layer">
+    <g
+       id="g4361"
+       transform="matrix(1.9375605,0,0,1.854284,-43.574575,-53.421403)"
+       style="display:inline">
+      <path
+         style="fill:#c8ab37;fill-opacity:1;stroke:#000000;stroke-width:0.99808323;stroke-opacity:1"
+         d="m 52.740558,45.770241 -0.105526,14.618644 c -3.015275,4.972157 -12.47992,4.912181 -14.984764,0 l 0.105526,-14.830509 z"
+         id="path4335"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         sodipodi:type="arc"
+         style="fill:#c8ab37;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+         id="path4331-7"
+         sodipodi:cx="45.233051"
+         sodipodi:cy="47.192795"
+         sodipodi:rx="7.6271186"
+         sodipodi:ry="5.6673727"
+         d="m 52.86017,47.192795 a 7.6271186,5.6673727 0 1 1 -15.254237,0 7.6271186,5.6673727 0 1 1 15.254237,0 z"
+         transform="matrix(1,0,0,0.73831775,0,10.866466)" />
+    </g>
+  </g>
+  <g
+     inkscape:label="foreground"
+     id="layer4"
+     inkscape:groupmode="layer"
+     style="display:none" />
+</svg>
