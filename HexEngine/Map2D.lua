@@ -36,6 +36,10 @@ local accessTable = {
 }
 
 local function coordToString(x,y)
+	-- Get rid of -0 index since when converting to a string -0 and 0 will be different strings 
+	-- which is not a good thing.
+	if x == 0 then x = 0 end
+	if y == 0 then y = 0 end
 	return ""..x..","..y
 end
 
