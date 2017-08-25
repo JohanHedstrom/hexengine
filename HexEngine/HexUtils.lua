@@ -20,7 +20,8 @@ setfenv(1,_P)
 local THIRTY_DEGGREES_RAD = math.pi/180*30
 
 -- Creates a hexagon display object
-local function createHexagon(isPointyTop, size)
+local function createHexagon(isPointyTop, size, squishFactor)
+	if squishFactor == nil then squishFactor = 1 end 
     local vertices = {}
     if isPointyTop == true then
         for i=0,5,1 do
@@ -28,7 +29,7 @@ local function createHexagon(isPointyTop, size)
             local x = size * math.cos(angle)
             local y = size * math.sin(angle)
             vertices[i*2+1] = x
-            vertices[i*2+2] = y
+            vertices[i*2+2] = y * squishFactor
         end    
     else
         for i=0,5,1 do
@@ -36,7 +37,7 @@ local function createHexagon(isPointyTop, size)
             local x = size * math.cos(angle)
             local y = size * math.sin(angle)
             vertices[i*2+1] = x
-            vertices[i*2+2] = y
+            vertices[i*2+2] = y * squishFactor
         end    
     end
     return display.newPolygon(0, 0, vertices )
