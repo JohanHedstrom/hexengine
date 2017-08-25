@@ -38,6 +38,8 @@ local accessTable = {
     hexHorDist = false,
     -- The vertical distance between two adjacent hex centers.
     hexVertDist = false,
+	-- The squish factor used to squish hexes along the y axis to fake perspective.
+	hexSquishFactor = false,
     -- The game object
     game = false,
     -- Returns a string representation of the HexView instance for debugging purposes
@@ -85,15 +87,22 @@ local THIRTY_DEGGREES_RAD = math.pi/180*30
 --       place hexes outside the 0-y range but they will be considered not visible.
 -- isPointyTop true for pointy top, false for flat top
 -- hexSize The size to use for the hexagons, center to corner
-local function createView(group, width, height, isPointyTop, hexSize)
+-- squishFactor A multiplyer used to squish the hexagons along the y axis to fake 
+--              perspective. The assets must be designed using this squishFactor.
+--              Defaults to 1.0
+local function createView(group, width, height, isPointyTop, hexSize, squishFactor)
     local o = {}
+	
+	-- defaults
+	if squishFactor == nil then squishFactor = 1 end
 
     -- value checking
     if type(group) ~= "table" then error("createView: group is of invalid type " .. type(group), 2) end 
     if type(width) ~= "number" then error("createView: width is of invalid type " .. type(width), 2) end 
     if type(height) ~= "number" then error("createView: height is of invalid type " .. type(height), 2) end 
     if type(isPointyTop) ~= "boolean" then error("createView: isPointyTop is of invalid type " .. type(isPointyTop), 2) end 
-    if type(hexSize) ~= "number" or hexSize < 0 then error("Attempt to set HexView:hexhexSize to invalid value " .. hexSize, 2) end 
+    if type(hexSize) ~= "number" or hexSize < 0 then error("Attempt to set HexView:hexSize to invalid value " .. hexSize, 2) end 
+    if type(squishFactor) ~= "number" then error("createView: squishFactor is of invalid type " .. type(squishFactor), 2) end 
 
     ---------- public members ----------
 
@@ -101,16 +110,18 @@ local function createView(group, width, height, isPointyTop, hexSize)
     o.hexSize = hexSize;
     
     if isPointyTop then
-        o.hexHeight = o.hexSize * 2 
+        o.hexHeight = o.hexSize * 2 * squishFactor
         o.hexWidth = math.sqrt(3)/2 * o.hexHeight
         o.hexHorDist = o.hexWidth
         o.hexVertDist = o.hexHeight * 3/4
     else
         o.hexWidth = o.hexSize * 2
-        o.hexHeight = math.sqrt(3)/2 * o.hexWidth  
+        o.hexHeight = math.sqrt(3)/2 * o.hexWidth * squishFactor 
         o.hexHorDist = o.hexWidth * 3/4
         o.hexVertDist = o.hexHeight
     end
+	
+	o.hexSquishFactor = squishFactor
 
     ---------- private members ----------
     
@@ -149,16 +160,19 @@ local function createView(group, width, height, isPointyTop, hexSize)
     mTouchPlate.anchorX = 0; mTouchPlate.anchorY = 0;
     mTouchPlate:setFillColor( 0.0, 0.0, 0.0,1.0)
     
+	-- Pixel to hex, takes squish factor into account but not scale.
     local function pixelToHex(x,y)
-        return HexUtils.pixelToHex(x,y,isPointyTop,hexSize)
+        return HexUtils.pixelToHex(x, y/o.hexSquishFactor, isPointyTop, hexSize)
     end
     
+	-- Hex to pixel, takes squish factor into account but not scale.
     local function hexToPixel(q,r)
-        return HexUtils.hexToPixel(q,r,isPointyTop,hexSize)
-    end
+        local x, y = HexUtils.hexToPixel(q,r,isPointyTop,hexSize)
+		return x,y * o.hexSquishFactor
+	end
     
     local function createHexagon()
-        return HexUtils.createHexagon(isPointyTop, hexSize)
+        return HexUtils.createHexagon(isPointyTop, hexSize, o.hexSquishFactor)
     end
 
     local function contentToBoard(x,y)
@@ -278,7 +292,7 @@ local function createView(group, width, height, isPointyTop, hexSize)
     ---------- public methods ----------
     
     function o:toString()
-        return "HexView(type: " .. ((self.hexIsPointyTop and "pointy topped") or "flat topped")  .. " size: " .. self.hexSize .. " height: " .. self.hexHeight .. " width: " .. self.hexWidth .. " horDist: " .. self.hexHorDist .. " vertDist: " .. self.hexVertDist .. ")";
+        return "HexView(type: " .. ((self.hexIsPointyTop and "pointy topped") or "flat topped")  .. " size: " .. self.hexSize .. " height: " .. self.hexHeight .. " width: " .. self.hexWidth .. " horDist: " .. self.hexHorDist .. " vertDist: " .. self.hexVertDist .. " squishFactor: " .. self.hexSquishFactor .. ")";
     end
     
     local mLastTopLeftQ = -1000.5
@@ -295,11 +309,7 @@ local function createView(group, width, height, isPointyTop, hexSize)
 --        if q == lastQ and r == lastR then return end
 
 --        print("updateView() Update required")
-        
-        -- Account for the part of the board that fits in the view after scaling
-        local width = mViewWidth/mScale;
-        local height = mViewHeight/mScale
-        
+                
         -- Any hexes in this table were visible before the update but no longer
         local previouslyVisible = mVisibleHexes
         
@@ -308,6 +318,11 @@ local function createView(group, width, height, isPointyTop, hexSize)
 
 		-- The pointy top layout case
 		if self.hexIsPointyTop == true then
+		
+			-- Account for the part of the board that fits in the view after scaling
+			local width = mViewWidth/mScale;
+			local height = (mViewHeight/mScale)
+		
 			-- The hex at the top left of the visible area 
 			local q,r = pixelToHex((0-mBoard.x)/mScale,(0-mBoard.y)/mScale)
 		
@@ -321,6 +336,8 @@ local function createView(group, width, height, isPointyTop, hexSize)
 			r = r - 1
 			numCols = numCols + 2
 			numRows = numRows + 3
+			
+			print("Rows x Cols", numRows, numCols)
 			
 			for qv,rv in HexUtils.verticals(q,r,self.hexIsPointyTop,numRows) do
 				for qh,rh in HexUtils.horizontals(qv,rv,self.hexIsPointyTop, numCols) do
@@ -351,6 +368,12 @@ local function createView(group, width, height, isPointyTop, hexSize)
 		else -- The flat topped layout case	
 			
 			-- The hex at the top right of the visible area
+--			local topRightX = (0-mBoard.x+mViewWidth)/mScale
+--			local topRightY = (0-mBoard.y)/mScale
+--			local bottomLeftX = (0-mBoard.x)/mScale
+--			local bottomLeftY = (0-mBoard.y+mViewHeight)/mScale
+--			local qStart,rStart = pixelToHex(topRightX,topRightY)
+
 			local topRightX = (0-mBoard.x+mViewWidth)/mScale
 			local topRightY = (0-mBoard.y)/mScale
 			local bottomLeftX = (0-mBoard.x)/mScale
@@ -360,8 +383,6 @@ local function createView(group, width, height, isPointyTop, hexSize)
 			local q = qStart
 			local r = rStart
 			
-			local numRows = math.floor((width/self.hexHorDist)+1+0.5)
-			local numCols = 3
 			local row = 0
 			local col = 0
 			local contCol = true
@@ -370,7 +391,6 @@ local function createView(group, width, height, isPointyTop, hexSize)
 			local firstVisibleColumnDetected = false
 			while contRow do
 				r = rStart + row
-				--for col=0,numCols-1,1 do
 				while contCol do
 					q = qStart + col - row*2 - 1
 					
