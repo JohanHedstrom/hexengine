@@ -110,8 +110,9 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     o.hexSize = hexSize;
     
     if isPointyTop then
-        o.hexHeight = o.hexSize * 2 * squishFactor
+        o.hexHeight = o.hexSize * 2
         o.hexWidth = math.sqrt(3)/2 * o.hexHeight
+		o.hexHeight = o.hexHeight * squishFactor
         o.hexHorDist = o.hexWidth
         o.hexVertDist = o.hexHeight * 3/4
     else
@@ -355,14 +356,15 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 					-- Enforce correct z order for all visible hexes (right overlaps left and bottom overlaps top)
 					local hex = mHexes:get(qh,rh)
 					if hex ~= nil then mBoard:insert(hex) end
-	--[[
-					local x,y = hexToPixel(qh,rh)
-					 
-					local rect = display.newRect(mBoard,x,y,self.hexWidth,self.hexHeight)
-					rect:setFillColor( 1.0, 1.0, 1.0, 0.5)
-					rect:setStrokeColor( 0, 0, 0, 0.5)
-					rect.strokeWidth = 1
-	]]--        
+	
+--[[					if qh == 0 and rh == 0 then
+						local x,y = hexToPixel(qh,rh)
+						local rect = display.newRect(mBoard,x,y,self.hexWidth,self.hexHeight)
+						rect:setFillColor( 1.0, 1.0, 1.0, 0.5)
+						rect:setStrokeColor( 0, 0, 0, 0.5)
+						rect.strokeWidth = 1
+					end
+]]--					
 				end
 			end
 		else -- The flat topped layout case	
