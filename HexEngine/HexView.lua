@@ -311,9 +311,10 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 
 --        print("updateView() Update required")
                 
-        -- Any hexes in this table were visible before the update but no longer
+        -- Any hexes in this table were visible before the update, and any 
+		-- remaining after the update are no longer visible.
         local previouslyVisible = mVisibleHexes
-        
+
         -- The new updated map of visible hexes
         mVisibleHexes = Map2D:new()        
 
@@ -368,14 +369,6 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 				end
 			end
 		else -- The flat topped layout case	
-			
-			-- The hex at the top right of the visible area
---			local topRightX = (0-mBoard.x+mViewWidth)/mScale
---			local topRightY = (0-mBoard.y)/mScale
---			local bottomLeftX = (0-mBoard.x)/mScale
---			local bottomLeftY = (0-mBoard.y+mViewHeight)/mScale
---			local qStart,rStart = pixelToHex(topRightX,topRightY)
-
 			local topRightX = (0-mBoard.x+mViewWidth)/mScale
 			local topRightY = (0-mBoard.y)/mScale
 			local bottomLeftX = (0-mBoard.x)/mScale
@@ -436,50 +429,16 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 				contCol = true
 				firstVisibleColumnDetected = false
 			end
- --[[			
-			for qv,rv in HexUtils.rowHexes(q,r,3) do
-				for qh,rh in HexUtils.colHexes(qv,rv,2) do
-
-					-- Add it to the new set of visible hexes
-					mVisibleHexes:set(qh,rh,true)
-
-					-- If it was not visible before then this is a newly visible hex
-					if previouslyVisible:erase(qh,rh) ~= true then
-						if visibilityHandler ~= nil and visibilityHandler.onHexVisibility ~= nil then 
-							visibilityHandler:onHexVisibility(qh,rh,true)
-						end
-					end
-					
-					-- Enforce correct z order for all visible hexes (right overlaps left and bottom overlaps top)
-					local hex = mHexes:get(qh,rh)
-					if hex ~= nil then mBoard:insert(hex) end
-				end
-				i = i + 1
-			end
-]]-- 			
-			-- Any hexes left in previouslyVisible are no longer visible
-			if previouslyVisible.size > 0 then print(""..previouslyVisible.size.." hexes no longer visible.") end
-			for q,r in previouslyVisible:iterator() do
-				if visibilityHandler ~= nil and visibilityHandler.onHexVisibility ~= nil then 
-					visibilityHandler:onHexVisibility(q,r,false)
-				end
-			end
         end
- --[[       for qn,rn in HexUtils.neighbors(0,0) do
-            local hexn = self.game:getHex(qn,rn)
-            self:setHex(qn,rn,hexn)
-        end
-]]--        
---[[        
-        local r; local q;
-        for r=0,20,1 do
-            for q=0,20,1 do
-                local hex = self.game:getHex(q,r)
-                local x,y = hexToPixel(q,r)
-                hex.x = x; hex.y = y
-                if hex ~= nil then mBoard:insert(hex) end
-            end
-        end]]--
+		
+		-- Any hexes left in previouslyVisible are no longer visible
+		if previouslyVisible.size > 0 then print(""..previouslyVisible.size.." hexes no longer visible.") end
+		for q,r in previouslyVisible:iterator() do
+			if visibilityHandler ~= nil and visibilityHandler.onHexVisibility ~= nil then 
+				visibilityHandler:onHexVisibility(q,r,false)
+			end
+		end
+		
     end    
 
     function o:removeHex(q,r)
