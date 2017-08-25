@@ -1,4 +1,4 @@
-print("Loading PlanetX...")
+print("Loading 3DTest...")
 
 local HexView = require("HexEngine.HexView")
 local HexUtils = require("HexEngine.HexUtils")
@@ -6,7 +6,7 @@ local Map2D = require("HexEngine.Map2D")
 local ScrollerInputHandler = require("HexEngine.ScrollerInputHandler")
 local PersistentStore = require("HexEngine.PersistentStore")
 
-local PlanetX = {}
+local ThreeDTest = {}
 
 -- Declare globals to be used by this package
 local print = print
@@ -40,7 +40,7 @@ local accessTable = {
     updateView = false,
 }
 
-function PlanetX:new(group, width, height)
+function ThreeDTest:new(group, width, height)
     local o = {}
 
     -- The hex view for the Test instance (created after the proxy is created)
@@ -108,7 +108,7 @@ function PlanetX:new(group, width, height)
         local terrainType = terrainTypes[tile.terrainIndex];
         		
         local bgImage = display.newImageRect(group, terrainType.bgImagePath, terrainType.w, terrainType.h )
---        local borderImage = display.newImageRect(group, "PlanetX/Resources/border.png", 87, 100)	
+--        local borderImage = display.newImageRect(group, "3DTest/Resources/border.png", 87, 100)	
 --        if terrainType.behindImagePath ~= nil then
 --            local behindImage = display.newImageRect(group, terrainType.behindImagePath, terrainType.w, terrainType.h)	
 --        end
@@ -175,7 +175,7 @@ view.width = 100
 view.anchorX = 0
 view.anchorY = 0
 view.anchorChildren = false
-local game = PlanetX:new(view, view.width, view.height)
+local game = ThreeDTest:new(view, view.width, view.height)
 
 local function layout()
     print("content: ", display.contentWidth, display.contentHeight)
@@ -214,5 +214,5 @@ end
 -- Add the "resize" event listener
 Runtime:addEventListener( "resize", onResize )
 
-return PlanetX
+return ThreeDTest
 
