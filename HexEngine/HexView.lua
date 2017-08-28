@@ -77,8 +77,6 @@ local accessTable = {
     setVisibilityHandler = false,
 }
 
-local THIRTY_DEGGREES_RAD = math.pi/180*30
-
 -- Creates a HexView instance
 -- group The display group where the view should display all the hexes
 -- width The width of the group that the view may use. The view can still 
@@ -140,20 +138,20 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     local mViewHeight = height
     
     -- The group where the game hexes will be displayed. Hexes will be placed on the 
-    -- board group depending on their hex coordinates with (0,0,0) cetered around the 
+    -- board group depending on their hex coordinates with 0,0 centered around the 
     -- group coordinate 0,0
     local mBoard = display.newGroup()
     
-    -- The scale of the board
+    -- The scale of the board. Changing the scale can be thought of as moving the view closer to or 
+    -- further away from the board. The board coordinates hexes are placed on does not change, but
+    -- more hexes can be displayed in the view because they appear smaller.
     local mScale = 1.0
     
     -- The hexes (display objects created by the game) that are currently placed on the board mapped to q,r
     local mHexes = Map2D:new()
     
-    -- The subset of hexes that are currently visible (i.e. within the view area) mapped to 
+    -- The subset of hex coordinates that are currently visible (i.e. within the view area) mapped to 
     -- the value true.
-    -- Note that a hex is present in this map doesn't mean that it is also in mHexes, the 
-    -- game might not have created a hex in response to the visibility event.
     local mVisibleHexes = Map2D:new()
     
     -- The plate used to catch touch events
