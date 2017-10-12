@@ -1,5 +1,8 @@
 print("Loading 3DTest...")
 
+local perlin = require("3DTest.PerlinNoise")
+perlin:load()
+
 local HexView = require("HexEngine.HexView")
 local HexUtils = require("HexEngine.HexUtils")
 local Map2D = require("HexEngine.Map2D")
@@ -40,11 +43,20 @@ local accessTable = {
     updateView = false,
 }
 
+--local view = display.newContainer(100, 100)
+local view = display.newGroup()
+view.height = 100
+view.width = 100
+view.anchorX = 0
+view.anchorY = 0
+view.anchorChildren = false
+
+
 function ThreeDTest:new(group, width, height)
     local o = {}
 
     -- The hex view for the Test instance (created after the proxy is created)
-    local hexView = HexView.createView(group, width, height, false, 50/math.cos(math.pi/6))
+    local hexView = HexView.createView(group, width, height, false, 50/math.cos(math.pi/6), 0.8)
     local inputHandler = ScrollerInputHandler:new(hexView)
     hexView:setInputHandler(inputHandler)
 
@@ -55,48 +67,55 @@ function ThreeDTest:new(group, width, height)
     local terrainTypes = {}
     local terrainCount = 0;
 
-    local function addTerrainType(terrainType, movementCost, bgImagePath, behindImagePath, w, h)
+    local function addTerrainType(terrainType, movementCost, bgImagePath, w, h, correctionX, correctionY)
         terrainCount = terrainCount + 1;
-        terrainTypes[terrainCount] = {type=terrainType, movementCost=movementCost, bgImagePath=bgImagePath, behindImagePath=behindImagePath, w=w, h=h}
+        terrainTypes[terrainCount] = {type=terrainType, movementCost=movementCost, bgImagePath=bgImagePath, w=w, h=h,
+            correctionX=correctionX, correctionY=correctionY}
 
         print("Added Terrain(" ..terrainType ..") movementCost: " ..movementCost .. " terrain count: " .. terrainCount)
     end
 
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("water", 1, "3DTest/Resources/water.png", nil, 137, 241);
-    addTerrainType("desert", 1, "3DTest/Resources/desert.png", nil, 137, 209);
-    addTerrainType("plain", 1, "3DTest/Resources/plain.png", nil, 137, 209);
-    addTerrainType("plain", 1, "3DTest/Resources/plain.png", nil, 137, 209);
-    addTerrainType("plain", 1, "3DTest/Resources/plain.png", nil, 137, 209);
-    addTerrainType("plain", 1, "3DTest/Resources/plain.png", nil, 137, 209);
-    addTerrainType("plain", 1, "3DTest/Resources/plain.png", nil, 137, 209);
-    addTerrainType("mountain", 1, "3DTest/Resources/mountain.png", nil, 122, 219);
---    addTerrainType("hole", 1, "", nil, 0, 0);
-
+    addTerrainType("water", 1, "3DTest/Resources/water.png", 137, 167, 0, 8);
+    addTerrainType("plain", 1, "3DTest/Resources/plain.png", 137, 167, 0, 8);
+    addTerrainType("desert", 1, "3DTest/Resources/desert.png", 137, 167, 0, 8);
+    addTerrainType("mountain", 1, "3DTest/Resources/mountain.png", 137, 174, 0, 8);
+    
+    local function getElevationPixels(level)
+        if level == 0 then return 0
+        elseif level == 1 then return -5
+        else return level * -10 + 5 end
+    end
+    
     -- Returns the tile at x,z, creating it if not already in the world.
-    -- tile: {terrainIndex=nr, selectType=nil/"normal"/"danger", selectedText=nil/"some text"}
+    -- The elevation is how high the tile is lifted, 0 means waterlevel, 1 ground, 2 raised, 3 max raised
+    -- tile: {terrain=terrain elevation=0...3}
     local function getHex(q,r)
-        local tile = world:get(q,r)
-        if tile == nil then
-            local terrainIndex = math.random(terrainCount)
-            tile = {terrainIndex=terrainIndex}
 
-			-- hole needs neighbours not being water, otherwise transform the hole to water
-			if tile.type == "hole" then
-			
-				for qn,rn in HexUtils.neighbours(q,r) do
-					local n_tile = world:get(qn,rn)
-				end
-			end
-			
-            --print("Generated new terrain \"" ..World.terrainTypes[terrainIndex].type .." at " ..x .."," ..z)
+        local tile = world:get(q,r)
+        
+        -- Generate a tile if it didn't exist
+        if tile == nil then
+--            local terrainIndex = math.random(terrainCount)
+
+            -- Get elevation from perlin noise
+            --local noise = (perlin:noise(q/10, r/10, 1)) * 15
+            --local elevation = math.floor(noise)  
+            local elevation = math.random(5)-2 
+            --print("perlin noise: ", noise, "elevation: ", elevation)
+            
+            -- Choose terrain depending on elevation
+            local terrainIndex = 0
+            if elevation <= 0 then 
+                elevation = 0
+                terrainIndex = 1 -- water
+            elseif elevation < 2 then
+                terrainIndex = 2 -- plain
+            else
+                terrainIndex = math.random(2)+1
+            end
+            tile = {terrain=terrainTypes[terrainIndex], elevation=elevation}
+--            if(tile.terrain.type == "plain") then tile.elevation = math.random(2) end
+--            if(tile.terrain.type == "desert") then tile.elevation = math.random(2) + 1 end
         end
 
 		if tile.type ~= "hole" then
@@ -105,20 +124,32 @@ function ThreeDTest:new(group, width, height)
         
         local group = display.newGroup()
         
-        local terrainType = terrainTypes[tile.terrainIndex];
-        		
-        local bgImage = display.newImageRect(group, terrainType.bgImagePath, terrainType.w, terrainType.h )
---        local borderImage = display.newImageRect(group, "3DTest/Resources/border.png", 87, 100)	
---        if terrainType.behindImagePath ~= nil then
---            local behindImage = display.newImageRect(group, terrainType.behindImagePath, terrainType.w, terrainType.h)	
---        end
---[[        local hex = HexUtils.createHexagon(true, 50)
-        hex:setFillColor( 0.3, 0.4, 1.0, 0.0)
-        hex:setStrokeColor( 0.4, 0.4, 0.4, 0.6)
-        hex.strokeWidth = 2
-        group:insert(hex)
-]]--        
---		group.alpha = 0.5
+        -- Add the terain
+        local terrain = tile.terrain;
+        local bgImage = display.newImageRect(group, terrain.bgImagePath, terrain.w, terrain.h )
+        local selectionOverlay = nil
+        if mSelected:get(q,r) == true then 
+            selectionOverlay = display.newImageRect(group, "3DTest/Resources/selectedOverlay.png", 117, 167 )
+        end
+        
+        -- Take corrections and elevation into account
+        local elevationPixels = getElevationPixels(tile.elevation)
+        bgImage.x = terrain.correctionX
+        bgImage.y = terrain.correctionY + elevationPixels
+        
+        -- And the selection overlay if any
+        if selectionOverlay ~= nil then 
+            selectionOverlay.x = terrain.correctionX
+            selectionOverlay.y = terrain.correctionY + elevationPixels
+        end
+        
+--        if tile.terrain.type == "water" then bgImage.y = 5 end
+        --print("elevation", tile.elevation)
+        
+--        local testHex = hexView:createTile();
+--        testHex.alpha = 0.5
+--        group:insert(testHex)
+        
         return group
     end
     
@@ -145,6 +176,45 @@ function ThreeDTest:new(group, width, height)
     function o:updateView()
         hexView:updateView()
     end
+    
+	-- Setup a tap handler that toggles selected on/off
+	local mTapHandler = {}
+	function mTapHandler:onHexTap(q,r,x,y)
+        local boardX, boardY = hexView:contentToBoard(x,y);
+        
+        -- Check if tile below left, below, or below right overshadows the tapped tile
+        local tile = world:get(q-1,r+1);
+        local elevPixels = getElevationPixels(tile.elevation);
+        local tq, tr = hexView:boardToTile(boardX, boardY-elevPixels)
+        if tq == (q-1) and tr == (r+1) then q=tq; r=tr; print("overshadowed!") end
+
+        tile = world:get(q,r+1);
+        elevPixels = getElevationPixels(tile.elevation);
+        tq, tr = hexView:boardToTile(boardX, boardY-elevPixels)
+        if tq == q and tr == (r+1) then q=tq; r=tr; print("overshadowed!") end
+
+        tile = world:get(q+1,r);
+        elevPixels = getElevationPixels(tile.elevation);
+        tq, tr = hexView:boardToTile(boardX, boardY-elevPixels)
+        if tq == (q+1) and tr == r then q=tq; r=tr; print("overshadowed!") end
+
+--        print("tap:", q, r, " checked: ",q, r+1, elevPixels, "result: ", tq, tr)
+        
+        local tile = world:get(q-1,r);
+        local below = world:get(q,r+1);
+        local belowRight = world:get(q+1,r+1);
+        
+		print("Tap on: ", q, r)
+		local selected = mSelected:get(q,r)
+		if selected == nil then
+			mSelected:set(q,r,true)
+		else
+			mSelected:erase(q,r)
+		end
+		hexView:setHex(q,r,getHex(q,r))
+        hexView:updateView()
+	end
+	inputHandler:setInputHandler(mTapHandler)    
 
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
@@ -168,13 +238,6 @@ function ThreeDTest:new(group, width, height)
     return proxy
 end
 
---local view = display.newContainer(100, 100)
-local view = display.newGroup()
-view.height = 100
-view.width = 100
-view.anchorX = 0
-view.anchorY = 0
-view.anchorChildren = false
 local game = ThreeDTest:new(view, view.width, view.height)
 
 local function layout()

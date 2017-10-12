@@ -44,7 +44,8 @@ local accessTable = {
     game = false,
     -- Returns a string representation of the HexView instance for debugging purposes
     toString = false,
-    -- 	s the hex view.
+    -- 	Updates the view. This triggers visibility events for tiles that has changed visibility and makes sure that all 
+    --  tiles have the correct z-order. Must be called after adding tiles to the board or after moving the board.
     updateView = false,
     -- setHex(q,r,hex) Adds the display object for hex q,r to the board.
     setHex = false,
@@ -62,6 +63,13 @@ local accessTable = {
     resize = false,
     -- center(q,r) Places the hex q,r in the center of the view. Returns new xOffset,yOffset. 
     center = false,
+    -- q,r boardToTile(x,y) Returns the coordinate of the tile that is under the given board coordinate. 
+    boardToTile = false,
+    -- x,y tileToBoard(q,r) Returns the board coordinate of the center of the tile with the provided coordinates. 
+    tileToBoard = false,
+    -- x,y tileToBoard(x,y) Converts the content space (view) coordinate to a board coordinate, 
+    -- taking board offset and scaling into account.
+    contentToBoard = false,
     -- setInputHandler(inputHandler) Sets the input handler. The handler can implement the following callbacks
     --     onHexTouchBegin(q,r,x,y,id) -- Called on first touch.
     --     onHexTouchMove(q,r,x,y,id)  -- Called on touch move.
@@ -75,6 +83,8 @@ local accessTable = {
     --                                     in the view. When a hex is not visible anymore it is 
     --                                     called again with visible = false
     setVisibilityHandler = false,
+    -- dispObj createTile() Creates a tile that fits the game borad (for testing purposes). 
+    createTile = false,
 }
 
 -- Creates a HexView instance
@@ -158,29 +168,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     local mTouchPlate = display.newRect(mViewGroup,0,0,width,height)
     mTouchPlate.anchorX = 0; mTouchPlate.anchorY = 0;
     mTouchPlate:setFillColor( 0.0, 0.0, 0.0,1.0)
-    
-	-- Pixel to hex, takes squish factor into account but not scale.
-    local function pixelToHex(x,y)
-        return HexUtils.pixelToHex(x, y/o.hexSquishFactor, isPointyTop, hexSize)
-    end
-    
-	-- Hex to pixel, takes squish factor into account but not scale.
-    local function hexToPixel(q,r)
-        local x, y = HexUtils.hexToPixel(q,r,isPointyTop,hexSize)
-		return x,y * o.hexSquishFactor
-	end
-    
-    local function createHexagon()
-        return HexUtils.createHexagon(isPointyTop, hexSize, o.hexSquishFactor)
-    end
-
-    local function contentToBoard(x,y)
-        local boardX, boardY = mTouchPlate:contentToLocal(x,y)
-        boardX = (math.floor(boardX + mViewWidth/2 + 0.5) - mBoard.x)/mScale;
-        boardY = (math.floor(boardY + mViewHeight/2 + 0.5) - mBoard.y)/mScale;
-        return boardX, boardY
-    end
-    
+            
     -- The id of the next tracker
     local nextTrackerId = 1
         
@@ -197,9 +185,9 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         nextTrackerId = nextTrackerId + 1
         
         -- Convert coordinates to board coordinates (0,0 in upper left corner) and account for scaling
-        local boardX, boardY = contentToBoard(event.x, event.y)
+        local boardX, boardY = o:contentToBoard(event.x, event.y)
         
-        local q,r = pixelToHex(boardX, boardY)
+        local q,r = o:boardToTile(boardX, boardY)
         
         function circle:touch(event)
             if ( event.phase == "began" ) then
@@ -261,7 +249,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         boardX = (math.floor(boardX + mViewWidth/2 + 0.5) - mBoard.x)/mScale;
         boardY = (math.floor(boardY + mViewHeight/2 + 0.5) - mBoard.y)/mScale;
         
-        local q,r = pixelToHex(boardX, boardY)
+        local q,r = boardToTile(boardX, boardY)
     
         if ( event.phase == "began" ) then
             display.getCurrentStage():setFocus( event.target )
@@ -294,6 +282,27 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         return "HexView(type: " .. ((self.hexIsPointyTop and "pointy topped") or "flat topped")  .. " size: " .. self.hexSize .. " height: " .. self.hexHeight .. " width: " .. self.hexWidth .. " horDist: " .. self.hexHorDist .. " vertDist: " .. self.hexVertDist .. " squishFactor: " .. self.hexSquishFactor .. ")";
     end
     
+	-- Returns the coordinate of the tile that is under the given board coordinate. Board coordinates
+    -- are not affected by scaling.
+    function o:boardToTile(x,y)
+        return HexUtils.pixelToHex(x, y/o.hexSquishFactor, isPointyTop, hexSize)
+    end
+    
+	-- Returns the board coordinate under the center of the given tile coordinate.
+    -- Board coordinates are not affected by scaling.
+    function o:tileToBoard(q,r)
+        local x, y = HexUtils.hexToPixel(q,r,isPointyTop,hexSize)
+		return x,y * o.hexSquishFactor
+	end
+
+    -- Converts a content space coordinate to a board coordinate, taking scaling into account.
+    function o:contentToBoard(x,y)
+        local boardX, boardY = mTouchPlate:contentToLocal(x,y)
+        boardX = (math.floor(boardX + mViewWidth/2 + 0.5) - mBoard.x)/mScale;
+        boardY = (math.floor(boardY + mViewHeight/2 + 0.5) - mBoard.y)/mScale;
+        return boardX, boardY
+    end
+    
     local mLastTopLeftQ = -1000.5
     local mLastTopLeftR = -1000.5
     
@@ -324,7 +333,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 			local height = (mViewHeight/mScale)
 		
 			-- The hex at the top left of the visible area 
-			local q,r = pixelToHex((0-mBoard.x)/mScale,(0-mBoard.y)/mScale)
+			local q,r = self:boardToTile((0-mBoard.x)/mScale,(0-mBoard.y)/mScale)
 		
 			-- The number of columns and rows to process
 			local numCols = math.floor(width/self.hexHorDist+0.5)
@@ -357,7 +366,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 					if hex ~= nil then mBoard:insert(hex) end
 	
 --[[					if qh == 0 and rh == 0 then
-						local x,y = hexToPixel(qh,rh)
+						local x,y = self:tileToBoard(qh,rh)
 						local rect = display.newRect(mBoard,x,y,self.hexWidth,self.hexHeight)
 						rect:setFillColor( 1.0, 1.0, 1.0, 0.5)
 						rect:setStrokeColor( 0, 0, 0, 0.5)
@@ -371,7 +380,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 			local topRightY = (0-mBoard.y)/mScale
 			local bottomLeftX = (0-mBoard.x)/mScale
 			local bottomLeftY = (0-mBoard.y+mViewHeight)/mScale
-			local qStart,rStart = pixelToHex(topRightX,topRightY)
+			local qStart,rStart = self:boardToTile(topRightX,topRightY)
 
 			local q = qStart
 			local r = rStart
@@ -389,7 +398,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 					
 					-- check if the hex is outside to the left, in which case it should not be 
 					-- added to the visible hexes
-					local qx,qy = hexToPixel(q,r)
+					local qx,qy = self:tileToBoard(q,r)
 					local rightEdgeX = qx + self.hexWidth/2
 					if rightEdgeX < bottomLeftX then else
 						-- Note the top y for the first visible column hex
@@ -446,7 +455,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         local hex = mHexes:erase(q,r)
         if hex ~= nil then 
             hex:removeSelf()
---            print("Removed hex "..q..","..r)
+            --print("Removed hex "..q..","..r)
         else print("Failed to remove hex "..q..","..r) end
     end
     
@@ -456,7 +465,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         if type(hex) ~= "table" then error("hex is of invalid type " .. type(hex), 2) end
 
         -- Insert hex into board group
-        local x,y = hexToPixel(q,r)
+        local x,y = self:tileToBoard(q,r)
 --        print("Set hex at "..q..","..r.." board " .. x ..",".. y)
         hex.x = x; hex.y = y
         mBoard:insert(hex)
@@ -528,7 +537,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         if type(q) ~= "number" then error("q is of invalid type " .. type(q), 2) end 
         if type(r) ~= "number" then error("r is of invalid type " .. type(r), 2) end 
 
-        local x,y = hexToPixel(q,r)
+        local x,y = self:tileToBoard(q,r)
         
         local offsetX = mViewWidth/2 - x*mScale
         local offsetY = mViewHeight/2 - y*mScale
@@ -548,6 +557,10 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         if bh == nil then visibilityHandler = nil end
         if type(bh) ~= "table" then error("visibilityHandler is of invalid type " .. type(bh), 2) end
         visibilityHandler = bh
+    end
+    
+    function o:createTile()
+        return HexUtils.createHexagon(isPointyTop, hexSize, o.hexSquishFactor)
     end
     
     -- private methods

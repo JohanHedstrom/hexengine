@@ -1,9 +1,8 @@
 print("Loading Test...")
 
 -- Test settings
-local squishFactor = 0.8
-local isPointyTop = true
-
+local squishFactor = 0.85
+local isPointyTop = false
 
 local HexView = require("HexEngine.HexView")
 local HexUtils = require("HexEngine.HexUtils")
@@ -59,7 +58,6 @@ function Test:new(group, width, height)
 
     -- Returns the tile at x,z, creating it if not already in the world.
 	local function getHex(q,r)
-		-- DEBUG
         local group = display.newGroup()
 		local hex = HexUtils.createHexagon(isPointyTop, hexView.hexSize, squishFactor)
         if mSelected:get(q,r) == true then 
