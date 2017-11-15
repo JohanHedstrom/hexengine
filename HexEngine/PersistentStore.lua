@@ -318,7 +318,7 @@ local function test()
 	store:save()
 end
 
-test()
+--test()
 
 
 return PersistentStore

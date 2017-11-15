@@ -8,6 +8,7 @@ local HexUtils = require("HexEngine.HexUtils")
 local Map2D = require("HexEngine.Map2D")
 local ScrollerInputHandler = require("HexEngine.ScrollerInputHandler")
 local PersistentStore = require("HexEngine.PersistentStore")
+local Tile = require("3DTest.Tile")
 
 local ThreeDTest = {}
 
@@ -79,13 +80,7 @@ function ThreeDTest:new(group, width, height)
     addTerrainType("plain", 1, "3DTest/Resources/plain.png", 137, 167, 0, 8);
     addTerrainType("desert", 1, "3DTest/Resources/desert.png", 137, 167, 0, 8);
     addTerrainType("mountain", 1, "3DTest/Resources/mountain.png", 137, 174, 0, 8);
-    
-    local function getElevationPixels(level)
-        if level == 0 then return 0
-        elseif level == 1 then return -5
-        else return level * -10 + 5 end
-    end
-    
+        
     -- Returns the tile at x,z, creating it if not already in the world.
     -- The elevation is how high the tile is lifted, 0 means waterlevel, 1 ground, 2 raised, 3 max raised
     -- tile: {terrain=terrain elevation=0...3}
@@ -100,7 +95,7 @@ function ThreeDTest:new(group, width, height)
             -- Get elevation from perlin noise
             --local noise = (perlin:noise(q/10, r/10, 1)) * 15
             --local elevation = math.floor(noise)  
-            local elevation = math.random(5)-2 
+            local elevation = math.random(2)-2 + math.random(2)
             --print("perlin noise: ", noise, "elevation: ", elevation)
             
             -- Choose terrain depending on elevation
@@ -109,56 +104,22 @@ function ThreeDTest:new(group, width, height)
                 elevation = 0
                 terrainIndex = 1 -- water
             elseif elevation < 2 then
-                terrainIndex = 2 -- plain
+                terrainIndex = math.random(2)+1
             else
                 terrainIndex = math.random(2)+1
             end
-            tile = {terrain=terrainTypes[terrainIndex], elevation=elevation}
---            if(tile.terrain.type == "plain") then tile.elevation = math.random(2) end
---            if(tile.terrain.type == "desert") then tile.elevation = math.random(2) + 1 end
+            
+            tile = Tile:new(hexView, q, r, terrainTypes[terrainIndex], elevation)
+              
+            world:set(q,r,tile)
         end
 
-		if tile.type ~= "hole" then
-			world:set(q,r,tile)
-		end
-        
-        local group = display.newGroup()
-        
-        -- Add the terain
-        local terrain = tile.terrain;
-        local bgImage = display.newImageRect(group, terrain.bgImagePath, terrain.w, terrain.h )
-        local selectionOverlay = nil
-        if mSelected:get(q,r) == true then 
-            selectionOverlay = display.newImageRect(group, "3DTest/Resources/selectedOverlay.png", 117, 167 )
-        end
-        
-        -- Take corrections and elevation into account
-        local elevationPixels = getElevationPixels(tile.elevation)
-        bgImage.x = terrain.correctionX
-        bgImage.y = terrain.correctionY + elevationPixels
-        
-        -- And the selection overlay if any
-        if selectionOverlay ~= nil then 
-            selectionOverlay.x = terrain.correctionX
-            selectionOverlay.y = terrain.correctionY + elevationPixels
-        end
-        
---        if tile.terrain.type == "water" then bgImage.y = 5 end
-        --print("elevation", tile.elevation)
-        
---        local testHex = hexView:createTile();
---        testHex.alpha = 0.5
---        group:insert(testHex)
-        
-        return group
+        return tile
     end
     
     function o:onHexVisibility(q,r,visible)
-        if visible == true then
-            hexView:setHex(q,r,getHex(q,r))
-        else
-            hexView:removeHex(q,r)
-        end
+        local tile = getHex(q,r)
+        tile:onVisibility(visible)
     end
 
     function o:resize(w,h) 
@@ -183,36 +144,42 @@ function ThreeDTest:new(group, width, height)
         local boardX, boardY = hexView:contentToBoard(x,y);
         
         -- Check if tile below left, below, or below right overshadows the tapped tile
-        local tile = world:get(q-1,r+1);
-        local elevPixels = getElevationPixels(tile.elevation);
+        local overshadowed = false
+        local t = world:get(q-1,r+1);
+        local elevPixels = Tile:getElevationPixels(t.elevationLevel);
         local tq, tr = hexView:boardToTile(boardX, boardY-elevPixels)
-        if tq == (q-1) and tr == (r+1) then q=tq; r=tr; print("overshadowed!") end
-
-        tile = world:get(q,r+1);
-        elevPixels = getElevationPixels(tile.elevation);
-        tq, tr = hexView:boardToTile(boardX, boardY-elevPixels)
-        if tq == q and tr == (r+1) then q=tq; r=tr; print("overshadowed!") end
-
-        tile = world:get(q+1,r);
-        elevPixels = getElevationPixels(tile.elevation);
-        tq, tr = hexView:boardToTile(boardX, boardY-elevPixels)
-        if tq == (q+1) and tr == r then q=tq; r=tr; print("overshadowed!") end
-
+        if tq == (q-1) and tr == (r+1) then q=tq; r=tr; overshadowed = true end
+        
+        if overshadowed == false then 
+            t = world:get(q,r+1);
+            elevPixels = Tile:getElevationPixels(t.elevationLevel);
+            tq, tr = hexView:boardToTile(boardX, boardY-elevPixels)
+            if tq == q and tr == (r+1) then q=tq; r=tr; overshadowed = true end
+        end
+        
+        if overshadowed == false then
+            t = world:get(q+1,r);
+            elevPixels = Tile:getElevationPixels(t.elevationLevel);
+            tq, tr = hexView:boardToTile(boardX, boardY-elevPixels)
+            if tq == (q+1) and tr == r then q=tq; r=tr; overshadowed = true end
+        end
+        
 --        print("tap:", q, r, " checked: ",q, r+1, elevPixels, "result: ", tq, tr)
         
-        local tile = world:get(q-1,r);
-        local below = world:get(q,r+1);
-        local belowRight = world:get(q+1,r+1);
+        local tile = world:get(q,r);
         
 		print("Tap on: ", q, r)
 		local selected = mSelected:get(q,r)
 		if selected == nil then
 			mSelected:set(q,r,true)
+            tile:onSelection(true)
 		else
 			mSelected:erase(q,r)
+            tile:onSelection(false)
 		end
-		hexView:setHex(q,r,getHex(q,r))
-        hexView:updateView()
+
+--		hexView:setHex(q,r,getHex(q,r))
+--        hexView:updateView()
 	end
 	inputHandler:setInputHandler(mTapHandler)    
 
