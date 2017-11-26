@@ -1,6 +1,6 @@
-print("Loading Tile...")
+print("Loading Unit...")
 
-local Tile = {}
+local unit = {}
 
 -- Declare globals to be used by this package
 local print = print
@@ -21,26 +21,16 @@ setfenv(1,_P)
 -- Expose public interface with controlled read and/or write access 
 -- Key present and false means read only, true means read/write
 local accessTable = {
-    -- visibility(visible) Called when the tile visibility changes
+    -- visibility(visible) Called when the unit visibility changes
     onVisibility = false,
-    -- onSelection(selected) Called when selection status of the tile changes
+    -- onSelection(selected) Called when selection status of the unit changes
     onSelection = false,
-    -- int elevationLevel The level of elevation of the tile 
-    elevationLevel = false,
 }
 
--- Transform elevation level to elevation pixels
-function Tile:getElevationPixels(level)
-    if level == 0 then return 0
-    elseif level == 1 then return -5
-    else return level * -10 + 5 end
-end
-
--- Creates a tile that belongs to the provided board and is placed at q,r, with the provided terrain
-function Tile:new(board, q, r, terrain, elevationLevel)
+-- Creates a Unit that belongs to the provided level located at q,r, that is of the provided unit type
+-- world - Map2D containing all the tiles of the world
+function Unit:new(level, q, r, unitType)
     local o = {}
-    
-    o.elevationLevel = elevationLevel
     
     local mSelected = false
     
@@ -53,7 +43,7 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         end
         
         -- Take corrections and elevation into account
-        local elevationPixels = Tile:getElevationPixels(elevationLevel)
+        local elevationPixels = Unit:getElevationPixels(elevationLevel)
         bgImage.x = terrain.correctionX
         bgImage.y = terrain.correctionY + elevationPixels
         
@@ -66,7 +56,7 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     end
     
     function o:onVisibility(visible)
-        print("Tile:visibility()", visible, board, q, r)
+        print("Unit:visibility()", visible, board, q, r)
         if visible == true then
             board:setHex(q,r,createUI())
         else
@@ -89,18 +79,18 @@ function Tile:new(board, q, r, terrain, elevationLevel)
             if accessTable[k] ~= nil
                 then return o[k]
             else
-                error("Attempt to access key " .. k .. " in instance of type " .. "Tile", 2)
+                error("Attempt to access key " .. k .. " in instance of type " .. "Unit", 2)
             end
         end, 
         __newindex = function(t,k,v) 
             if accessTable[k] == true
                 then return o[k]
             else
-                error("Attempt to set key " .. k .. "=" .. v .. " in instance of type " .. "Tile", 2)
+                error("Attempt to set key " .. k .. "=" .. v .. " in instance of type " .. "Unit", 2)
             end
         end })
     return proxy
 end
 
-return Tile
+return unit
 

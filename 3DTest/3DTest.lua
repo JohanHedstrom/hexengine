@@ -79,7 +79,7 @@ function ThreeDTest:new(group, width, height)
     addTerrainType("water", 1, "3DTest/Resources/water.png", 137, 167, 0, 8);
     addTerrainType("plain", 1, "3DTest/Resources/plain.png", 137, 167, 0, 8);
     addTerrainType("desert", 1, "3DTest/Resources/desert.png", 137, 167, 0, 8);
-    addTerrainType("mountain", 1, "3DTest/Resources/mountain.png", 137, 174, 0, 8);
+    addTerrainType("stone", 1, "3DTest/Resources/stone.png", 139, 167, 0, 8);
         
     -- Returns the tile at x,z, creating it if not already in the world.
     -- The elevation is how high the tile is lifted, 0 means waterlevel, 1 ground, 2 raised, 3 max raised
@@ -103,10 +103,10 @@ function ThreeDTest:new(group, width, height)
             if elevation <= 0 then 
                 elevation = 0
                 terrainIndex = 1 -- water
-            elseif elevation < 2 then
+            elseif elevation < 3 then
                 terrainIndex = math.random(2)+1
             else
-                terrainIndex = math.random(2)+1
+                terrainIndex = math.random(2)+2
             end
             
             tile = Tile:new(hexView, q, r, terrainTypes[terrainIndex], elevation)
