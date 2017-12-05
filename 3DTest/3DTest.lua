@@ -9,6 +9,7 @@ local Map2D = require("HexEngine.Map2D")
 local ScrollerInputHandler = require("HexEngine.ScrollerInputHandler")
 local PersistentStore = require("HexEngine.PersistentStore")
 local Tile = require("3DTest.Tile")
+local Unit = require("3DTest.Unit")
 
 local ThreeDTest = {}
 

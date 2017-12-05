@@ -1,6 +1,6 @@
 print("Loading Unit...")
 
-local unit = {}
+local Unit = {}
 
 -- Declare globals to be used by this package
 local print = print
@@ -27,51 +27,34 @@ local accessTable = {
     onSelection = false,
 }
 
--- Creates a Unit that belongs to the provided level located at q,r, that is of the provided unit type
--- world - Map2D containing all the tiles of the world
-function Unit:new(level, q, r, unitType)
+-- Creates a Unit
+function Unit:new(board, q, r, unitType)
     local o = {}
     
-    local mSelected = false
+    local mType = unitType
+    
+    local mGroup = nil
     
     local function createUI()
-        local group = display.newGroup()
-        local bgImage = display.newImageRect(group, terrain.bgImagePath, terrain.w, terrain.h )
-        local selectionOverlay = nil
-        if mSelected == true then 
-            selectionOverlay = display.newImageRect(group, "3DTest/Resources/selectedOverlay.png", 117, 167 )
-        end
+        if mGroup ~= nil then return mGroup end
+    
+        mGroup = display.newGroup()
+        local image = display.newImageRect(group, m_type.imagePath, m_type.imageWidth, m_type.imageHeight)
+         
+        -- Take corrections into account
+        image.x = m_type.correctionX
+        image.y = m_type.correctionY
         
-        -- Take corrections and elevation into account
-        local elevationPixels = Unit:getElevationPixels(elevationLevel)
-        bgImage.x = terrain.correctionX
-        bgImage.y = terrain.correctionY + elevationPixels
-        
-        -- And the selection overlay if any
-        if selectionOverlay ~= nil then 
-            selectionOverlay.x = terrain.correctionX
-            selectionOverlay.y = terrain.correctionY + elevationPixels
-        end
         return group
     end
     
-    function o:onVisibility(visible)
-        print("Unit:visibility()", visible, board, q, r)
-        if visible == true then
-            board:setHex(q,r,createUI())
-        else
-            board:removeHex(q,r)
-        end
+    -- Destroys the UI of this unit. If needsRemoval is true or omitted the UI will also be removed from the display.
+    local function destroyUI(needsRemoval)
+        if mGroup == nil then return end
+        if needsRemoval == true or needsRemoval == nil then mGroup:removeSelf() end
+        mGroup = nil
     end
-
-    function o:onSelection(selected)
-        mSelected = selected
-        o:onVisibility(false)
-        o:onVisibility(true)
-        board:updateView()
-        -- TODO Update in a better way !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    end
-    
+        
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
     setmetatable(proxy, {
@@ -92,5 +75,5 @@ function Unit:new(level, q, r, unitType)
     return proxy
 end
 
-return unit
+return Unit
 
