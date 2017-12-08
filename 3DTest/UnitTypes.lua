@@ -23,13 +23,12 @@ setfenv(1,_P)
 
 -------- Slime
 local unitType = UnitType:new("Slime")
-unitType.imagePath = "3DTest/Resources/Units/slime.png"
-unitType.imageWidth = 78
-unitType.imageHeight = 51
-unitType.correctionX = 0
-unitType.correctionY = 0
-unitType.movement = 3
-
+unitType:setImagePath("3DTest/Resources/Units/slime.png")
+unitType:setImageWidth(78)
+unitType:setImageHeight(51)
+unitType:setCorrectionX(-4)
+unitType:setCorrectionY(-5)
+unitType:setMovement(3)
 types["Slime"] = unitType;
 
 function UnitTypes:getType(name)

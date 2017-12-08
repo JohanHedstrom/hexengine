@@ -21,39 +21,39 @@ setfenv(1,_P)
 -- Expose public interface with controlled read and/or write access 
 -- Key present and false means read only, true means read/write
 local accessTable = {
-    -- visibility(visible) Called when the unit visibility changes
-    onVisibility = false,
-    -- onSelection(selected) Called when selection status of the unit changes
-    onSelection = false,
+    -- createUI() Creates the UI for the unit and returns its group.
+    createUI = false,
+    -- destroyUI(needsRemoval) Sets the UI to nil and optionaly removes it from the stage.
+    destroyUI = false,
 }
 
 -- Creates a Unit
-function Unit:new(board, q, r, unitType)
+function Unit:new(board, unitType)
     local o = {}
     
     local mType = unitType
     
     local mGroup = nil
-    
-    local function createUI()
+        
+    function o:createUI()
         if mGroup ~= nil then return mGroup end
     
         mGroup = display.newGroup()
-        local image = display.newImageRect(group, m_type.imagePath, m_type.imageWidth, m_type.imageHeight)
+        local image = display.newImageRect(mGroup, mType.imagePath, mType.imageWidth, mType.imageHeight)
          
         -- Take corrections into account
-        image.x = m_type.correctionX
-        image.y = m_type.correctionY
+        image.x = mType.correctionX
+        image.y = mType.correctionY
         
-        return group
+        return mGroup
     end
     
     -- Destroys the UI of this unit. If needsRemoval is true or omitted the UI will also be removed from the display.
-    local function destroyUI(needsRemoval)
+    function o:destroyUI(needsRemoval)
         if mGroup == nil then return end
         if needsRemoval == true or needsRemoval == nil then mGroup:removeSelf() end
         mGroup = nil
-    end
+    end        
         
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}

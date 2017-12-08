@@ -2,6 +2,8 @@ local TerrainTypes = require("3DTest.TerrainTypes")
 local Map2D = require("HexEngine.Map2D")
 local Tile = require("3DTest.Tile")
 local ScrollerInputHandler = require("HexEngine.ScrollerInputHandler")
+local Unit = require("3DTest.Unit")
+local UnitTypes = require("3DTest.UnitTypes")
 
 print("Loading Board...")
 
@@ -64,6 +66,10 @@ function Board:new(view)
         local tile = self:getTile(q,r)
         tile:onVisibility(visible)
     end
+    
+    local tile = o:getTile(0,0);
+    local unit = Unit:new(o, UnitTypes:getType("Slime"))
+    tile:addUnit(unit)
  
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}

@@ -27,8 +27,8 @@ terrainType:setImagePath("3DTest/Resources/plain.png")
 terrainType:setImageWidth(137)
 terrainType:setImageHeight(167)
 terrainType:setCorrectionX(0)
-terrainType.setCorrectionY(8)
-terrainType.setMovementCost(1)
+terrainType:setCorrectionY(8)
+terrainType:setMovementCost(1)
 types["Plain"] = terrainType
 
 function TerrainTypes:getType(name)

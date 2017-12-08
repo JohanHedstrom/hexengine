@@ -69,15 +69,15 @@ function Terrain:new(name)
     end
 
     function o:setCorrectionX(correctionX)
-        o.CorrectionX = correctionX;
+        o.correctionX = correctionX;
     end
 
     function o:setCorrectionY(correctionY)
-        o.CorrectionY = correctionY;
+        o.correctionY = correctionY;
     end
 
     function o:setMovementCost(movementCost)
-        o.MovementCost = movementCost;
+        o.movementCost = movementCost;
     end
 
     -- Return proxy that enforce access only to public members and methods

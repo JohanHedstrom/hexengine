@@ -27,6 +27,8 @@ local accessTable = {
     onSelection = false,
     -- int elevationLevel The level of elevation of the tile 
     elevationLevel = false,
+    -- addUnit(unit) Adds a unit to this tile.
+    addUnit = false,
 }
 
 -- Transform elevation level to elevation pixels
@@ -39,17 +41,20 @@ end
 -- Creates a tile that belongs to the provided board and is placed at q,r, with the provided terrain
 function Tile:new(board, q, r, terrain, elevationLevel)
     local o = {}
-    print(">>>> ", terrain.imageWidth, " <<<<<")
     o.elevationLevel = elevationLevel
     
     local mSelected = false
     
+    local mUnit = nil
+    
+    local mGroup = nil
+    
     local function createUI()
-        local group = display.newGroup()
-        local bgImage = display.newImageRect(group, terrain.imagePath, terrain.imageWidth, terrain.imageHeight )
+        mGroup = display.newGroup()
+        local bgImage = display.newImageRect(mGroup, terrain.imagePath, terrain.imageWidth, terrain.imageHeight )
         local selectionOverlay = nil
         if mSelected == true then 
-            selectionOverlay = display.newImageRect(group, "3DTest/Resources/selectedOverlay.png", 117, 167 )
+            selectionOverlay = display.newImageRect(mGroup, "3DTest/Resources/selectedOverlay.png", 117, 167 )
         end
         
         -- Take corrections and elevation into account
@@ -57,12 +62,21 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         bgImage.x = terrain.correctionX
         bgImage.y = terrain.correctionY + elevationPixels
         
-        -- And the selection overlay if any
+        -- Add the selection overlay if any
         if selectionOverlay ~= nil then 
             selectionOverlay.x = terrain.correctionX
             selectionOverlay.y = terrain.correctionY + elevationPixels
         end
-        return group
+        
+        -- Add unit if any
+        if mUnit ~= nil then 
+            local unitUI = mUnit:createUI()
+            print(">>>>>>>>><<<<<<<< unitUI", unitUI, "mGroup", mGroup)
+
+            mGroup:insert(unitUI)
+        end
+        
+        return mGroup
     end
     
     function o:onVisibility(visible)
@@ -71,6 +85,8 @@ function Tile:new(board, q, r, terrain, elevationLevel)
             board:setHex(q,r,createUI())
         else
             board:removeHex(q,r)
+            mGroup = nil
+            if mUnit ~= nil then mUnit:destroyUI() end
         end
     end
 
@@ -80,6 +96,18 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         o:onVisibility(true)
         board:updateView()
         -- TODO Update in a better way !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    end
+
+    function o:addUnit(unit)
+        if mUnit ~= nil then error("Attempt to add unit to time that already has a unit.") end
+        mUnit = unit
+            
+        -- Nothing more to do if there is no UI
+        if mGroup == nil then return end;
+        
+        local unitUI = unit:createUI()
+        mGroup:insert(unitUI)
+        print(">>>> Added unit to tile ", q, r )
     end
     
     -- Return proxy that enforce access only to public members and methods
