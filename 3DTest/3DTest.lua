@@ -8,8 +8,10 @@ local HexUtils = require("HexEngine.HexUtils")
 local Map2D = require("HexEngine.Map2D")
 local ScrollerInputHandler = require("HexEngine.ScrollerInputHandler")
 local PersistentStore = require("HexEngine.PersistentStore")
+local Board = require("3DTest.Board")
 local Tile = require("3DTest.Tile")
 local Unit = require("3DTest.Unit")
+local UnitTypes = require("3DTest.UnitTypes")
 
 local ThreeDTest = {}
 
@@ -53,8 +55,52 @@ view.anchorX = 0
 view.anchorY = 0
 view.anchorChildren = false
 
-
 function ThreeDTest:new(group, width, height)
+    local o = {}
+
+    -- The hex view for the Test instance (created after the proxy is created)
+    local hexView = HexView.createView(group, width, height, false, 50/math.cos(math.pi/6), 0.8)
+
+    local board = Board:new(hexView)
+
+    function o:resize(w,h) 
+        hexView:resize(w,h)
+    end
+    
+    function o:center(q,r)
+        hexView:center(q,r)
+    end
+
+    function o:setScale(s)
+        hexView:setScale(s,0,0)
+    end
+    
+    function o:updateView()
+        hexView:updateView()
+    end
+    
+    -- Return proxy that enforce access only to public members and methods
+    local proxy = {}
+    setmetatable(proxy, {
+        __index = function(t,k) 
+            if accessTable[k] ~= nil
+                then return o[k]
+            else
+                error("Attempt to access key " .. k .. " in instance of type " .. "Test", 2)
+            end
+        end, 
+        __newindex = function(t,k,v) 
+            if accessTable[k] == true
+                then return o[k]
+            else
+                error("Attempt to set key " .. k .. "=" .. v .. " in instance of type " .. "Test", 2)
+            end
+        end })
+        
+    return proxy
+end
+
+function ThreeDTest:old_new(group, width, height)
     local o = {}
 
     -- The hex view for the Test instance (created after the proxy is created)

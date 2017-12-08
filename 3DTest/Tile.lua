@@ -39,14 +39,14 @@ end
 -- Creates a tile that belongs to the provided board and is placed at q,r, with the provided terrain
 function Tile:new(board, q, r, terrain, elevationLevel)
     local o = {}
-    
+    print(">>>> ", terrain.imageWidth, " <<<<<")
     o.elevationLevel = elevationLevel
     
     local mSelected = false
     
     local function createUI()
         local group = display.newGroup()
-        local bgImage = display.newImageRect(group, terrain.bgImagePath, terrain.w, terrain.h )
+        local bgImage = display.newImageRect(group, terrain.imagePath, terrain.imageWidth, terrain.imageHeight )
         local selectionOverlay = nil
         if mSelected == true then 
             selectionOverlay = display.newImageRect(group, "3DTest/Resources/selectedOverlay.png", 117, 167 )
@@ -66,7 +66,7 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     end
     
     function o:onVisibility(visible)
-        print("Tile:visibility()", visible, board, q, r)
+        --print("Tile:visibility()", visible, board, q, r)
         if visible == true then
             board:setHex(q,r,createUI())
         else
