@@ -32,6 +32,8 @@ local accessTable = {
     -- getTile(q,r) Returns the Tile under q,r or nil if that coordinate is not part of the Board. 
     getTile = false,
     onHexVisibility = false,
+    -- setFocus(Tappable) Sets/unsets a tappable object (implements bool onTap()) that will receive all tap events regardless of where the tap is made. 
+    setFocus = false,
 }
 
 -- Creates a Board on which manages tiles, units, etc. The visual representation is managed by the 
@@ -41,16 +43,12 @@ function Board:new(view)
     
     local mTiles = Map2D:new()
 
+    -- The object currently in focus (will receive all tap events) or nil
+    local mFocus = nil
+    
     -- Set up tap handler
     local mInputHandler = ScrollerInputHandler:new(view)
     view:setInputHandler(mInputHandler)
-
-	local mTapHandler = {}
-	function mTapHandler:onHexTap(q,r,x,y)
-        print("Tapped: ", q, r)
-    end
-
-	mInputHandler:setInputHandler(mTapHandler)    
     
     -- Public function getTile()
     function o:getTile(q,r)
@@ -90,27 +88,70 @@ function Board:new(view)
     
     local tile = o:getTile(0,0);
     local unit = Unit:new(o, UnitTypes:getType("LarvaSpear"))
-    tile:addUnit(unit)
+    unit:moveTo(tile)
 
     tile = o:getTile(-3,0);
     unit = Unit:new(o, UnitTypes:getType("Slime"))
-    tile:addUnit(unit)
+    unit:moveTo(tile)
 
     tile = o:getTile(1,2);
     unit = Unit:new(o, UnitTypes:getType("SlimeFloating"))
-    tile:addUnit(unit)
+    unit:moveTo(tile)
 
     tile = o:getTile(3,-4);
     unit = Unit:new(o, UnitTypes:getType("Slime"))
-    tile:addUnit(unit)
+    unit:moveTo(tile)
 
     tile = o:getTile(-2,2);
     unit = Unit:new(o, UnitTypes:getType("Larva"))
-    tile:addUnit(unit)
+    unit:moveTo(tile)
 
     tile = o:getTile(3,-1);
     unit = Unit:new(o, UnitTypes:getType("Larva"))
-    tile:addUnit(unit)
+    unit:moveTo(tile)
+
+    -- Tap handler
+	local mTapHandler = {}
+	function mTapHandler:onHexTap(q,r,x,y)
+        local boardX, boardY = view:contentToBoard(x,y);
+        
+        -- Check if tile below left, below, or below right overshadows the tapped tile
+        local overshadowed = false
+        local t = o:getTile(q-1,r+1);
+        local elevPixels = Tile:getElevationPixels(t.elevationLevel);
+        local tq, tr = view:boardToTile(boardX, boardY-elevPixels)
+        if tq == (q-1) and tr == (r+1) then q=tq; r=tr; overshadowed = true end
+        
+        if overshadowed == false then 
+            t = o:getTile(q,r+1);
+            elevPixels = Tile:getElevationPixels(t.elevationLevel);
+            tq, tr = view:boardToTile(boardX, boardY-elevPixels)
+            if tq == q and tr == (r+1) then q=tq; r=tr; overshadowed = true end
+        end
+        
+        if overshadowed == false then
+            t = o:getTile(q+1,r);
+            elevPixels = Tile:getElevationPixels(t.elevationLevel);
+            tq, tr = view:boardToTile(boardX, boardY-elevPixels)
+            if tq == (q+1) and tr == r then q=tq; r=tr; overshadowed = true end
+        end
+        
+--        print("tap:", q, r, " checked: ",q, r+1, elevPixels, "result: ", tq, tr)
+        
+		print("Tap on: ", q, r)
+        
+        -- Redirect to focus object if any
+        if mFocus ~= nil then return mFocus:onTap(q,r) end
+
+        -- Otherwise redirect to the tapped tile
+        local tile = o:getTile(q,r);
+        tile:onTap(q,r)
+    end
+	mInputHandler:setInputHandler(mTapHandler)    
+
+    function o:setFocus(obj)
+        mFocus = obj
+    end
     
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}

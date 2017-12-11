@@ -1,3 +1,5 @@
+local HexUtils = require("HexEngine.HexUtils")
+
 print("Loading Unit...")
 
 local Unit = {}
@@ -10,6 +12,8 @@ local type = type
 local tostring = tostring
 local string = string
 local display = display
+local table = table
+local ipairs = ipairs
 
 -- Forbid access of all other globals
 local _P = {}
@@ -25,25 +29,34 @@ local accessTable = {
     createUI = false,
     -- destroyUI(needsRemoval) Sets the UI to nil and optionaly removes it from the stage.
     destroyUI = false,
+    -- moveTo(Tile tile) Moves the unit from it's current tile to the provided tile.
+    moveTo = false,
+    -- bool onTap(q,r) Called when the tile this unit is placed on is tapped (or is in focus). Return true if the tap is handled.
+    onTap = false,
 }
 
 -- Creates a Unit
 function Unit:new(board, unitType)
     local o = {}
     
+    -- The unit type
     local mType = unitType
     
+    -- The unit UI or nil if it currently has no UI
     local mGroup = nil
+    
+    -- The tile this unit is placed on, or nil if it isn't placed on the board.
+    local mTile = nil
         
     function o:createUI()
         if mGroup ~= nil then return mGroup end
     
         mGroup = display.newGroup()
-        local image = display.newImageRect(mGroup, mType.imagePath, mType.imageWidth, mType.imageHeight)
+        local image = display.newImageRect(mGroup, unitType.imagePath, unitType.imageWidth, unitType.imageHeight)
          
         -- Take corrections into account
-        image.x = mType.correctionX
-        image.y = mType.correctionY
+        image.x = unitType.correctionX
+        image.y = unitType.correctionY
         
         return mGroup
     end
@@ -54,6 +67,57 @@ function Unit:new(board, unitType)
         if needsRemoval == true or needsRemoval == nil then mGroup:removeSelf() end
         mGroup = nil
     end        
+    
+    -- The selected tiles or nil
+    local mSelection = nil
+    
+    function o:onTap(q,r)
+        if type(q) ~= "number" then error("Unit:onTap(): q is of invalid type " .. type(q), 2) end 
+        if type(r) ~= "number" then error("Unit:onTap(): r is of invalid type " .. type(r), 2) end 
+        print(unitType.name .. " tapped at "..q..","..r)
+    
+        if mTile == nil then return false end
+ 
+        if mSelection == nil then
+            mSelection = {}
+            for q,r in HexUtils.neighbors(mTile.q, mTile.r) do
+                local tile = board:getTile(q,r)
+                tile:onSelect(true)
+                table.insert(mSelection, tile)
+            end
+            mTile:onSelect(true)
+            board:setFocus(self)
+        elseif q == mTile.q and r == mTile.r then
+            board:setFocus(nil)
+            mTile:onSelect(false)
+            for i,tile in ipairs(mSelection) do
+                tile:onSelect(false)
+            end
+            mSelection = nil
+        else
+            mTile:onSelect(false)
+            for i,tile in ipairs(mSelection) do
+                tile:onSelect(false)
+                if tile.q == q and tile.r == r then o:moveTo(tile) end
+            end
+            mSelection = nil
+            board:setFocus(nil)
+        end
+
+        return true
+    end
+    
+    function o:moveTo(tile)
+        if mTile ~= nil then mTile:setUnit(nil) end
+    
+        mTile = tile
+        if tile ~= nil then 
+            tile:setUnit(self) 
+        else
+            -- If moved from the board then destroy the UI (and remove it from the stage)
+            o:destroyUI(true)
+        end
+    end
         
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}

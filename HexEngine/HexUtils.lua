@@ -102,8 +102,8 @@ end
 
 -- Iterator that iterates over the neighbors of the hex at q,r. Pointyness doesn't matter.
 local function neighbors(q,r)
-    if type(q) ~= "number" then error("HexView.hexToPixel: q is of invalid type " .. type(q), 2) end 
-    if type(r) ~= "number" then error("HexView.hexToPixel: r is of invalid type " .. type(r), 2) end 
+    if type(q) ~= "number" then error("HexUtils.neighbors(): q is of invalid type " .. type(q), 2) end 
+    if type(r) ~= "number" then error("HexUtils.neighbors(): r is of invalid type " .. type(r), 2) end 
 
     local n = {1,0, 0,1, -1,1, -1,0, 0,-1, 1,-1}
     local i = 0;

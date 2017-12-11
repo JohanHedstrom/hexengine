@@ -21,14 +21,20 @@ setfenv(1,_P)
 -- Expose public interface with controlled read and/or write access 
 -- Key present and false means read only, true means read/write
 local accessTable = {
+    -- The q coordinate of the tile
+    q = false,
+    -- The r coordinate of the tile
+    r = false,
     -- visibility(visible) Called when the tile visibility changes
     onVisibility = false,
-    -- onSelection(selected) Called when selection status of the tile changes
-    onSelection = false,
+    -- onTap() Called when the tile is tapped
+    onTap = false,
+    -- onSelect(bool selected) Call to select/deselect the tile
+    onSelect = false,
     -- int elevationLevel The level of elevation of the tile 
     elevationLevel = false,
-    -- addUnit(unit) Adds a unit to this tile.
-    addUnit = false,
+    -- setUnit(Unit) Sets/unsets the unit of this tile. Don't call directly, use Unit:move() instead.
+    setUnit = false,
 }
 
 -- Transform elevation level to elevation pixels
@@ -42,13 +48,15 @@ end
 function Tile:new(board, q, r, terrain, elevationLevel)
     local o = {}
     o.elevationLevel = elevationLevel
+    o.q = q
+    o.r = r
     
     local mSelected = false
     
     local mUnit = nil
     
     local mGroup = nil
-    
+        
     local function createUI()
         mGroup = display.newGroup()
         local bgImage = display.newImageRect(mGroup, terrain.imagePath, terrain.imageWidth, terrain.imageHeight )
@@ -72,8 +80,6 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         if mUnit ~= nil then 
             local unitUI = mUnit:createUI()
             unitUI.y = elevationPixels
-            print(">>>>>>>>><<<<<<<< unitUI", unitUI, "mGroup", mGroup)
-
             mGroup:insert(unitUI)
         end
         
@@ -91,26 +97,40 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         end
     end
 
-    function o:onSelection(selected)
-        mSelected = selected
+    function o:onTap()
+        -- Redirect to the unit if any
+        if mUnit ~= nil then return mUnit:onTap(q,r) else return false end
+    end
+    
+    function o:onSelect(selected)
+        if selected == mSelected then return end
+        mSelected = selected == true;
+
+        -- TODO Update in a better way !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         o:onVisibility(false)
         o:onVisibility(true)
         board:updateView()
-        -- TODO Update in a better way !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     end
 
-    function o:addUnit(unit)
-        if mUnit ~= nil then error("Attempt to add unit to time that already has a unit.") end
+    function o:setUnit(unit)
+        if (unit ~= nil) and (mUnit ~= nil) then error("Attempt to add unit to tile that already has a unit.") end
         mUnit = unit
-            
-        -- Nothing more to do if there is no UI
-        if mGroup == nil then return end;
         
-        local unitUI = unit:createUI()
-        mGroup:insert(unitUI)
-        print(">>>> Added unit to tile ", q, r )
+        -- If unit was cleared then nothing to do (it will automatically be removed from the 
+        -- display hierarcy if moved/destroyed)
+        if unit == nil then return end
+
+        if mGroup == nil then 
+            -- If placed on a tile with no UI then destroy the UI of the Unit
+            if mUnit then mUnit:destroyUI(true) end
+        else
+            -- Otherwise create the UI (if not already created) and insert it into the group
+            local unitUI = unit:createUI()
+            mGroup:insert(unitUI)
+        end
+        
     end
-    
+        
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
     setmetatable(proxy, {
