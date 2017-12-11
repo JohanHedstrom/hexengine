@@ -127,6 +127,7 @@ function Tile:new(board, q, r, terrain, elevationLevel)
             -- Otherwise create the UI (if not already created) and insert it into the group
             local unitUI = unit:createUI()
             mGroup:insert(unitUI)
+            unitUI.y = Tile:getElevationPixels(elevationLevel)
         end
         
     end
