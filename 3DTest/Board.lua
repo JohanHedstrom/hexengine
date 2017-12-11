@@ -17,6 +17,7 @@ local type = type
 local tostring = tostring
 local string = string
 local display = display
+local math = math
 
 -- Forbid access of all other globals
 local _P = {}
@@ -55,7 +56,27 @@ function Board:new(view)
     function o:getTile(q,r)
         local tile = mTiles:get(q,r)
         if tile == nil then 
-            tile = Tile:new(view, q, r, TerrainTypes:getType("Plain"), 0)
+            local rand = math.random(2)
+            local elevation = math.random(3)-3 + math.random(3)
+            
+            if q == 0 and r == 0 then if elevation <1 then elevation = 1 end end
+            if q == -3 and r == 0 then if elevation <1 then elevation = 1 end end
+            if q == 3 and r == -4 then if elevation <1 then elevation = 1 end end
+            if q == -2 and r == 2 then if elevation <1 then elevation = 1 end end
+            if q == 3 and r == -1 then if elevation <1 then elevation = 1 end end
+            
+            if elevation <= 0 then 
+                elevation = 0
+                tile = Tile:new(view, q, r, TerrainTypes:getType("Water"), elevation)
+            elseif elevation > 2 then 
+                tile = Tile:new(view, q, r, TerrainTypes:getType("Stone"), elevation)
+            else 
+                if (rand == 1) then 
+                    tile = Tile:new(view, q, r, TerrainTypes:getType("Desert"), elevation)
+                else
+                    tile = Tile:new(view, q, r, TerrainTypes:getType("Plain"), elevation)
+                end
+            end    
             mTiles:set(q,r,tile)
         end
         return tile
@@ -68,9 +89,29 @@ function Board:new(view)
     end
     
     local tile = o:getTile(0,0);
-    local unit = Unit:new(o, UnitTypes:getType("Slime"))
+    local unit = Unit:new(o, UnitTypes:getType("LarvaSpear"))
     tile:addUnit(unit)
- 
+
+    tile = o:getTile(-3,0);
+    unit = Unit:new(o, UnitTypes:getType("Slime"))
+    tile:addUnit(unit)
+
+    tile = o:getTile(1,2);
+    unit = Unit:new(o, UnitTypes:getType("SlimeFloating"))
+    tile:addUnit(unit)
+
+    tile = o:getTile(3,-4);
+    unit = Unit:new(o, UnitTypes:getType("Slime"))
+    tile:addUnit(unit)
+
+    tile = o:getTile(-2,2);
+    unit = Unit:new(o, UnitTypes:getType("Larva"))
+    tile:addUnit(unit)
+
+    tile = o:getTile(3,-1);
+    unit = Unit:new(o, UnitTypes:getType("Larva"))
+    tile:addUnit(unit)
+    
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
     setmetatable(proxy, {

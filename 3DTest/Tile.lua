@@ -71,6 +71,7 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         -- Add unit if any
         if mUnit ~= nil then 
             local unitUI = mUnit:createUI()
+            unitUI.y = elevationPixels
             print(">>>>>>>>><<<<<<<< unitUI", unitUI, "mGroup", mGroup)
 
             mGroup:insert(unitUI)
