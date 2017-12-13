@@ -38,7 +38,7 @@ unitType:setImageWidth(69)
 unitType:setImageHeight(95)
 unitType:setCorrectionX(0)
 unitType:setCorrectionY(-35)
-unitType:setMovement(3)
+unitType:setMovement(2)
 types["SlimeFloating"] = unitType;
 
 -------- Larva
@@ -48,7 +48,7 @@ unitType:setImageWidth(77)
 unitType:setImageHeight(46)
 unitType:setCorrectionX(0)
 unitType:setCorrectionY(-8)
-unitType:setMovement(3)
+unitType:setMovement(4)
 types["Larva"] = unitType;
 
 -------- LarvaSpear
@@ -58,7 +58,7 @@ unitType:setImageWidth(107)
 unitType:setImageHeight(95)
 unitType:setCorrectionX(6)
 unitType:setCorrectionY(-30)
-unitType:setMovement(3)
+unitType:setMovement(1)
 types["LarvaSpear"] = unitType;
 
 function UnitTypes:getType(name)

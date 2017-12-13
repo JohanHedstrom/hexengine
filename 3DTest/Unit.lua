@@ -1,4 +1,5 @@
 local HexUtils = require("HexEngine.HexUtils")
+local Map2D = require("HexEngine.Map2D")
 
 print("Loading Unit...")
 
@@ -33,7 +34,10 @@ local accessTable = {
     moveTo = false,
     -- bool onTap(q,r) Called when the tile this unit is placed on is tapped (or is in focus). Return true if the tap is handled.
     onTap = false,
+    -- Number getMovement() Gets the movement points for this unit
+    getMovement = false,
 }
+
 
 -- Creates a Unit
 function Unit:new(board, unitType)
@@ -47,7 +51,44 @@ function Unit:new(board, unitType)
     
     -- The tile this unit is placed on, or nil if it isn't placed on the board.
     local mTile = nil
+
+    -- The Map2D with info of the selected tiles. The info obj: {movementCost:0}
+    local mSelection = nil
+    
+    -- Selects the tiles this unit can move to or attack, including the tile the unit is standing on.
+    function o:selectReachableTiles()
+        if mTile == nil then mSelection = nil; return end
         
+        mSelection = Map2D:new()
+
+        local movementPoints = o:getMovement()
+        
+        local function selectNeighbors(origin, movementCost)
+
+            origin:onSelect(true)
+            mSelection:set(origin.q, origin.r, {tile=origin, movementCost=movementCost})
+            
+            for q,r in HexUtils.neighbors(origin.q, origin.r) do
+                if mSelection:get(q,r) == nil then
+                    local tile = board:getTile(q,r)
+                    if tile ~= nil then
+                        local cost = tile:getMovementCost(self) + movementCost
+                        if cost <= movementPoints then
+                            selectNeighbors(tile, cost)
+                        end
+                    end
+                end
+            end
+        end
+        
+        selectNeighbors(mTile, 0)
+        
+    end
+    
+    function o:getMovement()
+        return mType.movement
+    end
+    
     function o:createUI()
         if mGroup ~= nil then return mGroup end
     
@@ -67,18 +108,34 @@ function Unit:new(board, unitType)
         if needsRemoval == true or needsRemoval == nil then mGroup:removeSelf() end
         mGroup = nil
     end        
-    
-    -- The selected tiles or nil
-    local mSelection = nil
-    
+        
     function o:onTap(q,r)
         if type(q) ~= "number" then error("Unit:onTap(): q is of invalid type " .. type(q), 2) end 
         if type(r) ~= "number" then error("Unit:onTap(): r is of invalid type " .. type(r), 2) end 
         print(unitType.name .. " tapped at "..q..","..r)
     
-        if mTile == nil then return false end
- 
         if mSelection == nil then
+            o:selectReachableTiles()
+            if mSelection ~= nil then 
+                board:setFocus(self)
+            end
+        elseif q == mTile.q and r == mTile.r then
+            for qv,rv,info in mSelection:iterator() do
+                info.tile:onSelect(false)
+            end
+            mSelection = nil
+            board:setFocus(nil)
+        else
+            for qv,rv,info in mSelection:iterator() do
+                local tile = info.tile
+                tile:onSelect(false)
+                if tile.q == q and tile.r == r then o:moveTo(tile) end
+            end
+            mSelection = nil
+            board:setFocus(nil)
+        end
+        
+--[[        if mSelection == nil then
             mSelection = {}
             for q,r in HexUtils.neighbors(mTile.q, mTile.r) do
                 local tile = board:getTile(q,r)
@@ -103,7 +160,7 @@ function Unit:new(board, unitType)
             mSelection = nil
             board:setFocus(nil)
         end
-
+--]]
         return true
     end
     

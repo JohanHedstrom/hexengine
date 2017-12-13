@@ -35,6 +35,9 @@ local accessTable = {
     elevationLevel = false,
     -- setUnit(Unit) Sets/unsets the unit of this tile. Don't call directly, use Unit:move() instead.
     setUnit = false,
+    -- Number getMovementCost(Unit) Returns the movement cost for this tile for the provided unit. 
+    -- If the unit can't enter this tile then -1 is returned.
+    getMovementCost = false,
 }
 
 -- Transform elevation level to elevation pixels
@@ -131,6 +134,11 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         end
         
     end
+    
+    function o:getMovementCost(unit)
+        return terrain.movementCost
+    end
+    
         
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
