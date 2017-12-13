@@ -69,7 +69,14 @@ function Unit:new(board, unitType)
             mSelection:set(origin.q, origin.r, {tile=origin, movementCost=movementCost})
             
             for q,r in HexUtils.neighbors(origin.q, origin.r) do
-                if mSelection:get(q,r) == nil then
+                local info = mSelection:get(q,r)
+                local keepGoing = (info == nil)
+                if info ~= nil then
+                    -- check if this route is cheaper than the previous
+                    keepGoing = (info.tile:getMovementCost(self) + movementCost) < info.movementCost
+                end
+                
+                if keepGoing then
                     local tile = board:getTile(q,r)
                     if tile ~= nil then
                         local cost = tile:getMovementCost(self) + movementCost

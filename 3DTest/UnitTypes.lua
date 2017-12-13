@@ -48,7 +48,7 @@ unitType:setImageWidth(77)
 unitType:setImageHeight(46)
 unitType:setCorrectionX(0)
 unitType:setCorrectionY(-8)
-unitType:setMovement(4)
+unitType:setMovement(5)
 types["Larva"] = unitType;
 
 -------- LarvaSpear
