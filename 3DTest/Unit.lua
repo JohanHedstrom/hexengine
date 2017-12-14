@@ -15,6 +15,8 @@ local string = string
 local display = display
 local table = table
 local ipairs = ipairs
+local system = system
+
 
 -- Forbid access of all other globals
 local _P = {}
@@ -57,6 +59,7 @@ function Unit:new(board, unitType)
     
     -- Selects the tiles this unit can move to or attack, including the tile the unit is standing on.
     function o:selectReachableTiles()
+        local start = system.getTimer()
         if mTile == nil then mSelection = nil; return end
         
         mSelection = Map2D:new()
@@ -64,7 +67,6 @@ function Unit:new(board, unitType)
         local movementPoints = o:getMovement()
         
         local function selectNeighbors(origin, movementCost)
-
             origin:onSelect(true)
             mSelection:set(origin.q, origin.r, {tile=origin, movementCost=movementCost})
             
@@ -90,6 +92,7 @@ function Unit:new(board, unitType)
         
         selectNeighbors(mTile, 0)
         
+        print("elapsed:", system.getTimer() - start)
     end
     
     function o:getMovement()

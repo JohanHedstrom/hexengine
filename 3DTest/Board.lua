@@ -34,12 +34,16 @@ local accessTable = {
     onHexVisibility = false,
     -- setFocus(Tappable) Sets/unsets a tappable object (implements bool onTap()) that will receive all tap events regardless of where the tap is made. 
     setFocus = false,
+    -- The view of the board 
+    view = false,
 }
 
 -- Creates a Board on which manages tiles, units, etc. The visual representation is managed by the 
 -- View which displays part of the board.
 function Board:new(view)
     local o = {}
+    
+    o.view = view
     
     local mTiles = Map2D:new()
 
@@ -65,14 +69,14 @@ function Board:new(view)
             
             if elevation <= 0 then 
                 elevation = 0
-                tile = Tile:new(view, q, r, TerrainTypes:getType("Water"), elevation)
+                tile = Tile:new(self, q, r, TerrainTypes:getType("Water"), elevation)
             elseif elevation > 2 then 
-                tile = Tile:new(view, q, r, TerrainTypes:getType("Stone"), elevation)
+                tile = Tile:new(self, q, r, TerrainTypes:getType("Stone"), elevation)
             else 
                 if (rand == 1) then 
-                    tile = Tile:new(view, q, r, TerrainTypes:getType("Desert"), elevation)
+                    tile = Tile:new(self, q, r, TerrainTypes:getType("Desert"), elevation)
                 else
-                    tile = Tile:new(view, q, r, TerrainTypes:getType("Plain"), elevation)
+                    tile = Tile:new(self, q, r, TerrainTypes:getType("Plain"), elevation)
                 end
             end    
             mTiles:set(q,r,tile)

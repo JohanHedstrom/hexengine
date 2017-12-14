@@ -10,6 +10,9 @@ local type = type
 local tostring = tostring
 local string = string
 local display = display
+local math = math
+local options = options
+local native = native
 
 -- Forbid access of all other globals
 local _P = {}
@@ -58,26 +61,26 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     
     local mUnit = nil
     
+    -- The root of the tile UI
     local mGroup = nil
+    
+    -- The selection overlay
+    local mSelectionOverlay = nil
         
     local function createUI()
         mGroup = display.newGroup()
-        local bgImage = display.newImageRect(mGroup, terrain.imagePath, terrain.imageWidth, terrain.imageHeight )
-        local selectionOverlay = nil
-        if mSelected == true then 
-            selectionOverlay = display.newImageRect(mGroup, "3DTest/Resources/selectedOverlay.png", 117, 167 )
-        end
+        local bgImage = display.newImageRect(mGroup, terrain.imagePath, terrain.imageWidth, terrain.imageHeight)
+        mSelectionOverlay = display.newImageRect(mGroup, "3DTest/Resources/selectedOverlay.png", 117, 167 )
         
         -- Take corrections and elevation into account
         local elevationPixels = Tile:getElevationPixels(elevationLevel)
         bgImage.x = terrain.correctionX
         bgImage.y = terrain.correctionY + elevationPixels
         
-        -- Add the selection overlay if any
-        if selectionOverlay ~= nil then 
-            selectionOverlay.x = terrain.correctionX
-            selectionOverlay.y = terrain.correctionY + elevationPixels
-        end
+        -- Add the selection overlay and set its starting visibility
+        if mSelected then mSelectionOverlay.isVisible = true else mSelectionOverlay.isVisible = false end
+        mSelectionOverlay.x = terrain.correctionX
+        mSelectionOverlay.y = terrain.correctionY + elevationPixels
         
         -- Add unit if any
         if mUnit ~= nil then 
@@ -86,15 +89,23 @@ function Tile:new(board, q, r, terrain, elevationLevel)
             mGroup:insert(unitUI)
         end
         
+        -- Add the coordinate if debug is enabled
+        if options.debug then
+            local text = display.newText(q..","..r, 0, 0, native.systemFont, board.view.hexSize/2.5)
+            text.alpha = 0.6
+            text.y = elevationPixels
+            mGroup:insert(text)
+        end
+        
         return mGroup
     end
     
     function o:onVisibility(visible)
         --print("Tile:visibility()", visible, board, q, r)
         if visible == true then
-            board:setHex(q,r,createUI())
+            board.view:setHex(q,r,createUI())
         else
-            board:removeHex(q,r)
+            board.view:removeHex(q,r)
             mGroup = nil
             if mUnit ~= nil then mUnit:destroyUI() end
         end
@@ -107,12 +118,12 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     
     function o:onSelect(selected)
         if selected == mSelected then return end
-        mSelected = selected == true;
+        mSelected = (selected == true);
 
-        -- TODO Update in a better way !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        o:onVisibility(false)
-        o:onVisibility(true)
-        board:updateView()
+        -- Nothing to do if there is no UI
+        if mSelectionOverlay == nil then return end
+
+        mSelectionOverlay.isVisible = selected
     end
 
     function o:setUnit(unit)
@@ -136,6 +147,8 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     end
     
     function o:getMovementCost(unit)
+        if mUnit ~= nil then return math.huge end 
+        if terrain.name == "Water" then return math.huge end
         return terrain.movementCost
     end
     
