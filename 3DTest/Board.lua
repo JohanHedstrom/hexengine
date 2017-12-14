@@ -83,12 +83,6 @@ function Board:new(view)
         end
         return tile
     end
-
-    -- Called by the view when a tile becomes visible/invisible
-    function o:onHexVisibility(q,r,visible)
-        local tile = self:getTile(q,r)
-        tile:onVisibility(visible)
-    end
     
     local tile = o:getTile(0,0);
     local unit = Unit:new(o, UnitTypes:getType("LarvaSpear"))
@@ -114,6 +108,12 @@ function Board:new(view)
     unit = Unit:new(o, UnitTypes:getType("Larva"))
     unit:moveTo(tile)
 
+    -- Called by the view when a tile becomes visible/invisible
+    function o:onHexVisibility(q,r,visible)
+        local tile = self:getTile(q,r)
+        tile:onVisibility(visible)
+    end
+        
     -- Tap handler
 	local mTapHandler = {}
 	function mTapHandler:onHexTap(q,r,x,y)

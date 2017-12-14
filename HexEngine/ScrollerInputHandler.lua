@@ -32,7 +32,8 @@ local accessTable = {
     onHexTouchEnd = false,
 
     -- setInputHandler(inputHandler) Sets the input handler. The handler can implement the following callbacks
-    --     onHexTap(q,r,x,y) -- Called when a hex q,r is tapped. x,y is the content space coordinate of the tap
+    --     onHexTap(q,r,x,y) -- Called when a hex q,r is tapped. x,y is the content space coordinate of 
+    ---    the tap
     setInputHandler = false,
 }
 
@@ -50,12 +51,8 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
     -- The set input handler that will be called on touch events
     local mInputHandler = nil
     
-    local mLastTapTimestamp = 0
-    local mZoomedIn = true
     local mTouchX = 0
     local mTouchY = 0
-    local mOldTapX = 0
-    local mOldTapY = 0
     
     local trackers = {}
     local trackersCount = 0
@@ -155,8 +152,7 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
         
     end
     
-    function o:onHexTouchBegin(q,r,x,y,id)
-        
+    function o:onHexTouchBegin(q,r,x,y,id)        
         -- check if this is a new id in which case a tracker should be added. 
         -- (can happen when simulating multiview in the emulator)
         local tracker = trackers[id]
@@ -242,36 +238,12 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
         trackersCount = trackersCount - 1
         trackerCountChange()
     
-        local tapped = false
+        -- Check if a tap was made (touch end is very close to touch start)
         if (x >= (mTouchX-5) and x <= (mTouchX+5)) and (y >= (mTouchY-5) and y <= (mTouchY+5)) then
-            tapped = true
-        end
-
-        -- Tap made
-        if tapped then
-            local doubleTapTime = system.getTimer() - mLastTapTimestamp
-            if(doubleTapTime < 500) and (x >= (mOldTapX-10) and x <= (mOldTapX+10)) and (y >= (mOldTapY-10) and y <= (mOldTapY+10)) then
-                -- Double tap made
-                print("Double-tap at hex("..q..","..r..")" .. " cord("..x..","..y..")", mZoomedIn)
-                if mZoomedIn then
-                    mZoomedIn = false
-                    hexView:setScale(0.5,x,y)
-                    hexView:updateView()
-                else
-                    mZoomedIn = true
-                    hexView:setScale(1.0,x,y)
-                    hexView:updateView()
-                end
-            else    
-                print("Tap at hex("..q..","..r..")" .. " cord("..x..","..y..")".." id "..id)
-                if mInputHandler ~= nil and mInputHandler.onHexTap ~= nil then
-                    mInputHandler:onHexTap(q,r,x,y)
-                end
-                mOldTapX = x
-                mOldTapY = y
+            if mInputHandler ~= nil and mInputHandler.onHexTap ~= nil then
+                mInputHandler:onHexTap(q,r,x,y)
             end
-            mLastTapTimestamp = system.getTimer()
-        end    
+        end
     end
 
     function o:setInputHandler(ih)
