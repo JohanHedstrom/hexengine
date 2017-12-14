@@ -116,6 +116,40 @@ local function neighbors(q,r)
     end
 end
 
+-- Iterator that iterates over the ring of hexes with the given radius with center at q,r. Pointyness doesn't matter.
+local function circle(q,r,radius)
+    if type(q) ~= "number" then error("HexUtils.neighbors(): q is of invalid type " .. type(q), 2) end 
+    if type(r) ~= "number" then error("HexUtils.neighbors(): r is of invalid type " .. type(r), 2) end 
+    if type(radius) ~= "number" then error("HexUtils.neighbors(): radius is of invalid type " .. type(r), 2) end 
+
+  --  local n = {1,0, 0,1, -1,1, -1,0, 0,-1, 1,-1}
+    local n = {-1,1, -1,0, 0,-1, 1,-1, 1,0, 0,1}
+    local i = 0;
+    local qc = radius
+    local rc = 0
+    local step = 0
+    return function ()
+        if i > 5 then return nil end
+        
+        -- step direction
+        local sq = n[i*2+1]
+        local sr = n[i*2+2]
+        
+        -- do step
+        qc = qc + sq
+        rc = rc + sr
+        step = step + 1
+        
+        -- increase direction (i) and reset step if enough steps has been made
+        if step >= radius then
+            i = i + 1
+            step = 0
+        end
+
+        return qc,rc
+    end
+end
+
 -- Iterator that iterates over all hexes in a column (increasing q coordinate) starting at q,r. Note 
 -- that this iterator will iterate indefinitely if width is nil so has to be used in a while loop
 -- with some custom end criteria.
@@ -251,6 +285,7 @@ HexUtils.horizontals = horizontals
 HexUtils.verticals = verticals
 HexUtils.rowHexes = rowHexes
 HexUtils.colHexes = colHexes
+HexUtils.circle = circle
 
 setmetatable(HexUtils, {
     __index = function(t,k) error("Attempt to access unsupported key in HexUtils", 2) end, 

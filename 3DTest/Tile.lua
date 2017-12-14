@@ -118,7 +118,7 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     
     function o:onSelect(selected)
         if selected == mSelected then return end
-        mSelected = (selected == true);
+        mSelected = (selected == true)
 
         -- Nothing to do if there is no UI
         if mSelectionOverlay == nil then return end
