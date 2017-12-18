@@ -31,15 +31,20 @@ setfenv(1,_P)
 local accessTable = {
     -- getTile(q,r) Returns the Tile under q,r or nil if that coordinate is not part of the Board. 
     getTile = false,
+    -- placeTile(q,r) Places the provided Tile at q,r. 
+    placeTile = false,
     onHexVisibility = false,
     -- setFocus(Tappable) Sets/unsets a tappable object (implements bool onTap()) that will receive all tap events regardless of where the tap is made. 
     setFocus = false,
     -- The view of the board 
     view = false,
+    -- setMapGenerator(generator) If set, generator:generateTile(q,r) will be called if Board:getTile() is called for a non-existing tile.
+    setMapGenerator = false,
 }
 
 -- Creates a Board on which manages tiles, units, etc. The visual representation is managed by the 
--- View which displays part of the board.
+-- View which displays part of the board. The provided level is responsible for populating the board 
+-- with tiles, units, etc.
 function Board:new(view)
     local o = {}
     
@@ -50,10 +55,35 @@ function Board:new(view)
     -- The object currently in focus (will receive all tap events) or nil
     local mFocus = nil
     
+    -- The map generator, if any, responsible for generating tiles on-the-fly
+    local mMapGenerator = nil
+    
     -- Set up tap handler
     local mInputHandler = ScrollerInputHandler:new(view)
     view:setInputHandler(mInputHandler)
+
+    function o:getTile(q,r)
+        local tile = mTiles:get(q,r)
+        if tile == nil and mMapGenerator ~= nil then
+            tile = mMapGenerator:generateTile(q,r)
+            if tile ~= nil then
+                mTiles:set(q,r,tile)
+            end
+        end
+        return tile
+    end
+
+    function o:placeTile(q,r,tile)
+        -- TODO: handle replaced tiles correctly
+        mTiles:set(q,r,tile)
+    end
     
+    function o:setMapGenerator(generator)
+        if generator ~= nil and generator.generateTile == nil then error("Attempt to set an invalid map generator. It must have the function generateTile()", 2) end
+        mMapGenerator = generator
+    end
+    
+--[[    
     -- Public function getTile()
     function o:getTile(q,r)
         local tile = mTiles:get(q,r)
@@ -108,36 +138,48 @@ function Board:new(view)
     unit = Unit:new(o, UnitTypes:getType("Larva"))
     unit:moveTo(tile)
 
+--]]
+    
+    
     -- Called by the view when a tile becomes visible/invisible
     function o:onHexVisibility(q,r,visible)
         local tile = self:getTile(q,r)
-        tile:onVisibility(visible)
+        if tile ~= nil then 
+            tile:onVisibility(visible)
+        end
     end
         
     -- Tap handler
 	local mTapHandler = {}
 	function mTapHandler:onHexTap(q,r,x,y)
         local boardX, boardY = view:contentToBoard(x,y);
+        local tq, tr, elevPixels
         
         -- Check if tile below left, below, or below right overshadows the tapped tile
         local overshadowed = false
         local t = o:getTile(q-1,r+1);
-        local elevPixels = Tile:getElevationPixels(t.elevationLevel);
-        local tq, tr = view:boardToTile(boardX, boardY-elevPixels)
-        if tq == (q-1) and tr == (r+1) then q=tq; r=tr; overshadowed = true end
-        
-        if overshadowed == false then 
-            t = o:getTile(q,r+1);
+        if t ~= nil then
             elevPixels = Tile:getElevationPixels(t.elevationLevel);
             tq, tr = view:boardToTile(boardX, boardY-elevPixels)
-            if tq == q and tr == (r+1) then q=tq; r=tr; overshadowed = true end
+            if tq == (q-1) and tr == (r+1) then q=tq; r=tr; overshadowed = true end
+        end
+            
+        if overshadowed == false then 
+            t = o:getTile(q,r+1);
+            if t ~= nil then
+                elevPixels = Tile:getElevationPixels(t.elevationLevel);
+                tq, tr = view:boardToTile(boardX, boardY-elevPixels)
+                if tq == q and tr == (r+1) then q=tq; r=tr; overshadowed = true end
+            end
         end
         
         if overshadowed == false then
             t = o:getTile(q+1,r);
-            elevPixels = Tile:getElevationPixels(t.elevationLevel);
-            tq, tr = view:boardToTile(boardX, boardY-elevPixels)
-            if tq == (q+1) and tr == r then q=tq; r=tr; overshadowed = true end
+            if t ~= nil then
+                elevPixels = Tile:getElevationPixels(t.elevationLevel);
+                tq, tr = view:boardToTile(boardX, boardY-elevPixels)
+                if tq == (q+1) and tr == r then q=tq; r=tr; overshadowed = true end
+            end
         end
         
 --        print("tap:", q, r, " checked: ",q, r+1, elevPixels, "result: ", tq, tr)
@@ -149,8 +191,11 @@ function Board:new(view)
 
         -- Otherwise redirect to the tapped tile
         local tile = o:getTile(q,r);
-        tile:onTap(q,r)
+        if tile ~= nil then
+            tile:onTap(q,r)
+        end
     end
+    
 	mInputHandler:setInputHandler(mTapHandler)    
 
     function o:setFocus(obj)
@@ -176,7 +221,7 @@ function Board:new(view)
         end })
         
     view:setVisibilityHandler(proxy)
-                
+    
     return proxy
 end
 

@@ -12,6 +12,7 @@ local Board = require("3DTest.Board")
 local Tile = require("3DTest.Tile")
 local Unit = require("3DTest.Unit")
 local UnitTypes = require("3DTest.UnitTypes")
+local LevelRandom = require("3DTest.LevelRandom")
 
 local ThreeDTest = {}
 
@@ -62,7 +63,10 @@ function ThreeDTest:new(group, width, height)
     local hexView = HexView.createView(group, width, height, false, 50/math.cos(math.pi/6), 0.8)
 
     local board = Board:new(hexView)
-
+    local levelRandom = LevelRandom:new()
+    levelRandom:setup(board)
+    board:setMapGenerator(levelRandom)
+    
     function o:resize(w,h) 
         hexView:resize(w,h)
     end
