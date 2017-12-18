@@ -58,7 +58,7 @@ unitType:setImageWidth(107)
 unitType:setImageHeight(95)
 unitType:setCorrectionX(6)
 unitType:setCorrectionY(-30)
-unitType:setMovement(1)
+unitType:setMovement(2)
 types["LarvaSpear"] = unitType;
 
 function UnitTypes:getType(name)

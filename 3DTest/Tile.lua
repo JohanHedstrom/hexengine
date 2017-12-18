@@ -46,8 +46,8 @@ local accessTable = {
 -- Transform elevation level to elevation pixels
 function Tile:getElevationPixels(level)
     if level == 0 then return 0
-    elseif level == 1 then return -5
-    else return level * -10 + 5 end
+    elseif level == 1 then return -7
+    else return level * -12 + 5 end
 end
 
 -- Creates a tile that belongs to the provided board and is placed at q,r, with the provided terrain

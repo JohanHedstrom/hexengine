@@ -5,7 +5,7 @@ local Board = require("3DTest.Board")
 local UnitTypes = require("3DTest.UnitTypes")
 local Unit = require("3DTest.Unit")
 
-print("Loading Board...")
+print("Loading LevelRandom...")
 
 local LevelRandom = {}
 
@@ -29,48 +29,44 @@ setfenv(1,_P)
 -- Expose public interface with controlled read and/or write access 
 -- Key present and false means read only, true means read/write
 local accessTable = {
-    -- setup(board) Performs setup of the level on the provided board.
-    setup = false,
     -- Tile generateTile(q,r) Generates a tile for q,r. Called by the board when getTile() is called but no tile is present for just-in-time placement.
     generateTile = false,
 }
 
 -- Creates a level responsible for generating tiles and units.
-function LevelRandom:new()
+function LevelRandom:new(board)
     local o = {}
     
-    local mBoard = nil
+    local mBoard = board
     
-    function o:setup(board)
-        mBoard = board
-
+    local function setup()
         local tile = o:generateTile(0,0);
-        mBoard:placeTile(0,0,tile)
+        mBoard:placeTile(tile)
         local unit = Unit:new(mBoard, UnitTypes:getType("LarvaSpear"))
         unit:moveTo(tile)
 
         tile = o:generateTile(-3,0);
-        mBoard:placeTile(-3,0,tile)
+        mBoard:placeTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("Slime"))
         unit:moveTo(tile)
 
         tile = o:generateTile(1,2);
-        mBoard:placeTile(1,2,tile)
+        mBoard:placeTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("SlimeFloating"))
         unit:moveTo(tile)
 
         tile = o:generateTile(3,-4);
-        mBoard:placeTile(3,-4,tile)
+        mBoard:placeTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("Slime"))
         unit:moveTo(tile)
 
         tile = o:generateTile(-2,2);
-        mBoard:placeTile(-2,2,tile)
+        mBoard:placeTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("Larva"))
         unit:moveTo(tile)
 
         tile = o:generateTile(3,-1);
-        mBoard:placeTile(3,-1,tile)
+        mBoard:placeTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("Larva"))
         unit:moveTo(tile)
         
@@ -103,6 +99,8 @@ function LevelRandom:new()
 --        print("Generated tile", tile, q, r)
         return tile
     end
+
+    setup()
     
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}

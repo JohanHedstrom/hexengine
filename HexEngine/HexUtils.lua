@@ -125,8 +125,8 @@ local function circle(q,r,radius)
   --  local n = {1,0, 0,1, -1,1, -1,0, 0,-1, 1,-1}
     local n = {-1,1, -1,0, 0,-1, 1,-1, 1,0, 0,1}
     local i = 0;
-    local qc = radius
-    local rc = 0
+    local qc = q+radius
+    local rc = r
     local step = 0
     return function ()
         if i > 5 then return nil end

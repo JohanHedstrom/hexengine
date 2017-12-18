@@ -31,7 +31,7 @@ setfenv(1,_P)
 local accessTable = {
     -- getTile(q,r) Returns the Tile under q,r or nil if that coordinate is not part of the Board. 
     getTile = false,
-    -- placeTile(q,r) Places the provided Tile at q,r. 
+    -- placeTile(tile) Places the provided Tile on the board. 
     placeTile = false,
     onHexVisibility = false,
     -- setFocus(Tappable) Sets/unsets a tappable object (implements bool onTap()) that will receive all tap events regardless of where the tap is made. 
@@ -73,9 +73,10 @@ function Board:new(view)
         return tile
     end
 
-    function o:placeTile(q,r,tile)
+    function o:placeTile(tile)
+        if tile == nil then return end
         -- TODO: handle replaced tiles correctly
-        mTiles:set(q,r,tile)
+        mTiles:set(tile.q, tile.r, tile)
     end
     
     function o:setMapGenerator(generator)
