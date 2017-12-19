@@ -74,18 +74,16 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         
         -- Take corrections and elevation into account
         local elevationPixels = Tile:getElevationPixels(elevationLevel)
-        bgImage.x = terrain.correctionX
-        bgImage.y = terrain.correctionY + elevationPixels
+        bgImage:translate(terrain.correctionX, terrain.correctionY + elevationPixels)
         
         -- Add the selection overlay and set its starting visibility
         if mSelected then mSelectionOverlay.isVisible = true else mSelectionOverlay.isVisible = false end
-        mSelectionOverlay.x = terrain.correctionX
-        mSelectionOverlay.y = terrain.correctionY + elevationPixels
+        mSelectionOverlay:translate(terrain.correctionX, terrain.correctionY + elevationPixels)
         
         -- Add unit if any
         if mUnit ~= nil then 
             local unitUI = mUnit:createUI()
-            unitUI.y = elevationPixels
+            unitUI:translate(0, elevationPixels)
             mGroup:insert(unitUI)
         end
         
@@ -93,7 +91,7 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         if options.debug then
             local text = display.newText(q..","..r, 0, 0, native.systemFont, board.view.hexSize/2.5)
             text.alpha = 0.6
-            text.y = elevationPixels
+            text.translate(0, elevationPixels)
             mGroup:insert(text)
         end
         

@@ -16,6 +16,8 @@ local isDevice = isDevice
 local options = options
 local tostring = tostring
 
+local sleep = sleep
+
 -- Forbid access of all other globals
 local _P = {}
 setmetatable(_P, {
@@ -306,7 +308,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     local mLastTopLeftQ = -1000.5
     local mLastTopLeftR = -1000.5
     
-    function o:updateView()
+    function o:updateView()    
         -- top left hex
 --        local lastQ = mLastTopLeftQ
 --        local lastR = mLastTopLeftR

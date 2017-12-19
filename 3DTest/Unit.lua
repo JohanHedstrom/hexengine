@@ -106,8 +106,7 @@ function Unit:new(board, unitType)
         local image = display.newImageRect(mGroup, unitType.imagePath, unitType.imageWidth, unitType.imageHeight)
          
         -- Take corrections into account
-        image.x = unitType.correctionX
-        image.y = unitType.correctionY
+        image:translate(unitType.correctionX, unitType.correctionY)
         
         return mGroup
     end
