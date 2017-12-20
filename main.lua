@@ -70,12 +70,12 @@ local function enterFrame(event)
     if(fps < minFps) then minFps = fps end
     if(sinceLastUpdate >= 500) then
         lastUpdateTimestamp = current
-        print(fps, minFps)
+        --print(fps, minFps)
         if fpsText then 
             fpsText:removeSelf()
         end
         fpsText = display.newText(""..minFps, 30, 20, native.systemFont, 20)
-        minFps = fps * 0.5 + minFps * 0.5
+        minFps = math.floor(fps * 0.5 + minFps * 0.5 + 0.5)
     end
 end
 

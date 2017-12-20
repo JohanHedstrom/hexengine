@@ -140,10 +140,13 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     -- Set to true to update the view before next frame
     local mIsDirty = false
     
-    -- The current board offset. Needs to be applied to the board before next frame if mIsDirty is true
-    local mOffsetX = 0
-    local mOffsetY = 0
-        
+    -- The x,y board offset delta that needs to be applied before next frame if mIsDirty is true
+    local mDeltaOffsetX = 0
+    local mDeltaOffsetY = 0
+    
+    -- The scale delta that needs to be applied before next frame if mIsDirty is true
+    local mDeltaScale = 0
+    
     -- The set input handler that will be called on board touch events
     local inputHandler = nil
 
@@ -164,8 +167,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     
     -- The scale of the board. Changing the scale can be thought of as moving the view closer to or 
     -- further away from the board. The board coordinates hexes are placed on does not change, but
-    -- more hexes can be displayed in the view because they appear smaller. Needs to be applied to 
-    -- the board before next frame if mIsDirty is true.
+    -- more hexes can be displayed in the view because they appear smaller.
     local mScale = 1.0
     
     -- The hexes (display objects created by the game) that are currently placed on the board mapped to q,r
@@ -279,8 +281,8 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     -- Converts a content space coordinate to a board coordinate, taking scaling into account.
     function o:contentToBoard(x,y)
         local boardX, boardY = mTouchPlate:contentToLocal(x,y)
-        boardX = (math.floor(boardX + mViewWidth/2 + 0.5) - mOffsetX)/mScale;
-        boardY = (math.floor(boardY + mViewHeight/2 + 0.5) - mOffsetY)/mScale;
+        boardX = (math.floor(boardX + mViewWidth/2 + 0.5) - mBoard.x)/mScale;
+        boardY = (math.floor(boardY + mViewHeight/2 + 0.5) - mBoard.y)/mScale;
         return boardX, boardY
     end
     
@@ -322,7 +324,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 			local height = (mViewHeight/mScale)
 		
 			-- The hex at the top left of the visible area 
-			local q,r = self:boardToTile((0-mOffsetX)/mScale,(0-mOffsetY)/mScale)
+			local q,r = self:boardToTile((0-mBoard.x)/mScale,(0-mBoard.y)/mScale)
 		
 			-- The number of columns and rows to process
 			local numCols = math.floor(width/self.hexHorDist+0.5)
@@ -365,10 +367,10 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 				end
 			end
 		else -- The flat topped layout case	
-			local topRightX = (0-mOffsetX+mViewWidth)/mScale
-			local topRightY = (0-mOffsetY)/mScale
-			local bottomLeftX = (0-mOffsetX)/mScale
-			local bottomLeftY = (0-mOffsetY+mViewHeight)/mScale
+			local topRightX = (0-mBoard.x+mViewWidth)/mScale
+			local topRightY = (0-mBoard.y)/mScale
+			local bottomLeftX = (0-mBoard.x)/mScale
+			local bottomLeftY = (0-mBoard.y+mViewHeight)/mScale
 			local qStart,rStart = self:boardToTile(topRightX,topRightY)
 
 			local q = qStart
@@ -477,14 +479,14 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         if type(x) ~= "number" then error("x is of invalid type " .. type(x), 2) end 
         if type(y) ~= "number" then error("y is of invalid type " .. type(y), 2) end 
         
-        mOffsetX = x
-        mOffsetY = y
+        mDeltaOffsetX = x - mBoard.x
+        mDeltaOffsetY = y - mBoard.y
 
         mIsDirty = true
     end
 
     function o:getBoardOffset()
-        return mOffsetX, mOffsetY
+        return mBoard.x, mBoard.y
     end
     
     function o:setScale(scale, x, y)
@@ -498,13 +500,15 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         -- The board coordinate directly under x,y
         local bx, by = mBoard:contentToLocal(x,y)
 
+        mBoard.xScale = scale
+        mBoard.yScale = scale
         mScale = scale
 
 --        print("board coordinates", bx, by)
 --        display.newCircle(mBoard,bx,by,30)
         
---        bx = (bx - mOffsetX + (mViewWidth)/2)/mScale
---        by = (by - mOffsetY + mViewHeight/2)/mScale
+--        bx = (bx - mBoard.x + (mViewWidth)/2)/mScale
+--        by = (by - mBoard.y + mViewHeight/2)/mScale
 
         -- Calculate the board offset in unscaled coordinates that places the board coordinate bx,by under x,y after scaling
         local offsetX = mViewWidth/2 + centerOffsetX - bx*mScale
@@ -562,14 +566,17 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     
     -- private methods
     local function enterFrame()
+        --print("enter frame!!")
         if mIsDirty == true then 
-            mBoard.x = mOffsetX
-            mBoard.y = mOffsetY
-            mBoard.xScale = mScale
-            mBoard.yScale = mScale
+            mBoard.x = mBoard.x + mDeltaOffsetX
+            mBoard.y = mBoard.y + mDeltaOffsetY
+            mDeltaOffsetX = 0
+            mDeltaOffsetY = 0
+
             o:updateViewImpl() 
             mIsDirty = false
         end
+        
     end
 
     Runtime:addEventListener('enterFrame', enterFrame)

@@ -62,7 +62,7 @@ function ThreeDTest:new(group, width, height)
 
     -- The hex view for the Test instance (created after the proxy is created)
     local hexView = HexView.createView(group, width, height, false, 50/math.cos(math.pi/6), 0.8)
-
+    
     local board = Board:new(hexView)
     local level = LevelIsland:new(board)
     board:setMapGenerator(level)
@@ -282,7 +282,7 @@ end
 
 layout()
 
-game:setScale(1.0)
+game:setScale(0.5)
 game:center(0,0)
 game:updateView()
 
