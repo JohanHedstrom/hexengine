@@ -36,7 +36,6 @@ local accessTable = {
     resize = false,
     center = false,
     setScale = false,
-    updateView = false,
 }
 
 function Wasteland:new(group, width, height)
@@ -136,10 +135,6 @@ function Wasteland:new(group, width, height)
         hexView:setScale(s)
     end
     
-    function o:updateView()
-        hexView:updateView()
-    end
-
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
     setmetatable(proxy, {
@@ -185,14 +180,12 @@ end
 --    view1.width = display.contentWidth
 --    view1.height = display.contentHeight
     game:resize(display.contentWidth, display.contentHeight)
-    game:updateView()
 end
 
 layout()
 
 game:setScale(1.0)
 game:center(0,0)
-game:updateView()
 
 -- The resize event handler
 local function onResize(event)

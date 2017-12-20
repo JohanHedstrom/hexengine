@@ -41,7 +41,6 @@ local accessTable = {
     resize = false,
     center = false,
     setScale = false,
-    updateView = false,
 }
 
 function Test:new(group, width, height)
@@ -94,10 +93,6 @@ function Test:new(group, width, height)
         hexView:setScale(s,0,0)
     end
     
-    function o:updateView()
-        hexView:updateView()
-    end
-
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
     setmetatable(proxy, {
@@ -172,14 +167,12 @@ end
 	rect.strokeWidth = 2
     rect.anchorX = 0
 	rect.anchorY = 0
-	game:updateView()
 end
 
 layout()
 
 game:setScale(1.0)
 game:center(0,0)
-game:updateView()
 
 -- The resize event handler
 local function onResize(event)

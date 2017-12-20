@@ -47,9 +47,6 @@ local accessTable = {
     game = false,
     -- Returns a string representation of the HexView instance for debugging purposes
     toString = false,
-    -- 	Updates the view. This triggers visibility events for tiles that has changed visibility and makes sure that all 
-    --  tiles have the correct z-order. Must be called after adding tiles to the board or after moving the board.
-    updateView = false,
     -- setHex(q,r,hex) Adds the display object for hex q,r to the board.
     setHex = false,
     -- removeHex(q,r) Removes the display object for hex q,r from the board.
@@ -287,15 +284,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     local mLastTopLeftQ = -1000.5
     local mLastTopLeftR = -1000.5
     
-    local updateViewCallCount = 0
-    
-    function o:updateView()    
-    end
-    
-    function o:updateViewImpl()
-        --updateViewCallCount = updateViewCallCount + 1
-        --print("updateView", updateViewCallCount)
-    
+    function o:updateViewImpl()    
         -- top left hex
 --        local lastQ = mLastTopLeftQ
 --        local lastR = mLastTopLeftR

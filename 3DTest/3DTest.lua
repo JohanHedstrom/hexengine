@@ -46,7 +46,6 @@ local accessTable = {
     resize = false,
     center = false,
     setScale = false,
-    updateView = false,
 }
 
 --local view = display.newContainer(100, 100)
@@ -77,10 +76,6 @@ function ThreeDTest:new(group, width, height)
 
     function o:setScale(s)
         hexView:setScale(s,0,0)
-    end
-    
-    function o:updateView()
-        hexView:updateView()
     end
     
     -- Return proxy that enforce access only to public members and methods
@@ -185,10 +180,6 @@ function ThreeDTest:old_new(group, width, height)
         hexView:setScale(s,0,0)
     end
     
-    function o:updateView()
-        hexView:updateView()
-    end
-    
 	-- Setup a tap handler that toggles selected on/off
 	local mTapHandler = {}
 	function mTapHandler:onHexTap(q,r,x,y)
@@ -229,8 +220,6 @@ function ThreeDTest:old_new(group, width, height)
             tile:onSelection(false)
 		end
 
---		hexView:setHex(q,r,getHex(q,r))
---        hexView:updateView()
 	end
 	inputHandler:setInputHandler(mTapHandler)    
 
@@ -276,15 +265,12 @@ end
 --	view.x = 150
 --	view.y = 150
 --    game:resize(display.contentWidth-300, display.contentHeight-300)
-
-    game:updateView()
 end
 
 layout()
 
 game:setScale(0.5)
 game:center(0,0)
-game:updateView()
 
 -- The resize event handler
 local function onResize(event)

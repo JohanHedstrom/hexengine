@@ -223,7 +223,6 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
         offsetY = offsetY + midDy
 --      print("Drag delta: "..dx..","..dy.." offset: "..mOffsetx..","..mOffsety.." at hex("..q..","..r..")" .. " cord("..x..","..y..")")
         hexView:setBoardOffset(offsetX,offsetY)
-        hexView:updateView()
     end
 
     function o:onHexTouchEnd(q,r,x,y,id) 
