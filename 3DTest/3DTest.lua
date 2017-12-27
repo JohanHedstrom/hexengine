@@ -269,7 +269,7 @@ end
 
 layout()
 
-game:setScale(0.5)
+game:setScale(0.7)
 game:center(0,0)
 
 -- The resize event handler
