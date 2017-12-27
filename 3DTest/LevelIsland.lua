@@ -65,12 +65,15 @@ function LevelIsland:new(board)
             end
         end
 
-        generateMountain(-5,0,5)
+--[[        generateMountain(-5,0,5)
         generateMountain(5,1,5)
         generateMountain(0,0,1)
         generateMountain(4,-7,2)
         generateMountain(-4,8,2)
-        
+--]]       
+
+        generateMountain(0,0,6)
+ 
         -- Generate tiles depending on heightmap
         print("...", heightMap.size)
         for q,r,height in heightMap:iterator() do
@@ -87,14 +90,27 @@ function LevelIsland:new(board)
             mBoard:placeTile(tile)
         end
         
-        local tile = mBoard:getTile(-5,0)
+        local tile = mBoard:getTile(0,0)
         local unit = Unit:new(mBoard, UnitTypes:getType("LarvaSpear"))
         unit:moveTo(tile)
         
-        tile = mBoard:getTile(5,1)
-        unit = Unit:new(mBoard, UnitTypes:getType("LarvaSpear"))
-        unit:moveTo(tile)
-
+        local enemyCount = 0
+        while enemyCount < 5 do
+            local lq = math.random(11) - 6
+            local lr = math.random(11) - 6
+            --print(lq, lr)
+            tile = mBoard:getTile(lq,lr)
+            if tile ~= nil and tile:getUnit() == nil and tile.terrain.name ~= "Water" then
+                local r = math.random(10)
+                if(r >= 9) then
+                    unit = Unit:new(mBoard, UnitTypes:getType("SlimeFloating"))
+                else
+                    unit = Unit:new(mBoard, UnitTypes:getType("Slime"))
+                end
+                unit:moveTo(tile)
+                enemyCount = enemyCount + 1
+            end
+        end   
     end
     
     -- Public function generateTile()

@@ -28,7 +28,7 @@ unitType:setImageWidth(78)
 unitType:setImageHeight(51)
 unitType:setCorrectionX(-4)
 unitType:setCorrectionY(-10)
-unitType:setMovement(3)
+unitType:setMovement(1)
 types["Slime"] = unitType;
 
 -------- SlimeFloating

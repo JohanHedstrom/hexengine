@@ -28,6 +28,8 @@ local accessTable = {
     q = false,
     -- The r coordinate of the tile
     r = false,
+    -- The terran type
+    terrain = false,
     -- visibility(visible) Called when the tile visibility changes
     onVisibility = false,
     -- onTap() Called when the tile is tapped
@@ -38,6 +40,8 @@ local accessTable = {
     elevationLevel = false,
     -- setUnit(Unit) Sets/unsets the unit of this tile. Don't call directly, use Unit:move() instead.
     setUnit = false,
+    -- Unit getUnit() Sets/unsets the unit of this tile. Don't call directly, use Unit:move() instead.
+    getUnit = false,
     -- Number getMovementCost(Unit) Returns the movement cost for this tile for the provided unit. 
     -- If the unit can't enter this tile then -1 is returned.
     getMovementCost = false,
@@ -56,11 +60,12 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     o.elevationLevel = elevationLevel
     o.q = q
     o.r = r
-    
+    o.terrain = terrain
+
     local mSelected = false
     
     local mUnit = nil
-    
+        
     -- The root of the tile UI
     local mGroup = nil
     
@@ -143,7 +148,11 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         end
         
     end
-    
+
+    function o:getUnit()
+        return mUnit
+    end
+        
     function o:getMovementCost(unit)
         if mUnit ~= nil then return math.huge end 
         if terrain.name == "Water" then return math.huge end

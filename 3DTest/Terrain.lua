@@ -22,7 +22,7 @@ setfenv(1,_P)
 -- Expose public interface with controlled read and/or write access 
 -- Key present and false means read only, true means read/write
 local accessTable = {
-    -- String with the unit type name
+    -- String with the terrain type name
     name = false,
     -- String with the path to the image for the unit.
     imagePath = false,
