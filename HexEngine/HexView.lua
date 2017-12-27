@@ -67,9 +67,10 @@ local accessTable = {
     boardToTile = false,
     -- x,y tileToBoard(q,r) Returns the board coordinate of the center of the tile with the provided coordinates. 
     tileToBoard = false,
-    -- x,y tileToBoard(x,y) Converts the content space (view) coordinate to a board coordinate, 
-    -- taking board offset and scaling into account.
+    -- x,y tileToBoard(x,y) Converts the content space (view) coordinate to a board coordinate, taking board offset and scaling into account.
     contentToBoard = false,
+    -- x,y tileToBoard(x,y) Converts the board space coordinate to a content (view) coordinate, taking board offset and scaling into account.
+    boardToContent = false,
     -- setInputHandler(inputHandler) Sets the input handler. The handler can implement the following callbacks
     --     onHexTouchBegin(q,r,x,y,id) -- Called on first touch.
     --     onHexTouchMove(q,r,x,y,id)  -- Called on touch move.
@@ -273,12 +274,21 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 		return x,y * o.hexSquishFactor
 	end
 
-    -- Converts a content space coordinate to a board coordinate, taking scaling into account.
+    -- Converts a content space (stage) coordinate to a board coordinate, taking scaling into account.
     function o:contentToBoard(x,y)
         local boardX, boardY = mTouchPlate:contentToLocal(x,y)
-        boardX = (math.floor(boardX + mViewWidth/2 + 0.5) - mOffsetX)/mScale;
-        boardY = (math.floor(boardY + mViewHeight/2 + 0.5) - mOffsetY)/mScale;
+        boardX = (math.floor(boardX + mViewWidth/2 + 0.5) - mOffsetX)/mScale
+        boardY = (math.floor(boardY + mViewHeight/2 + 0.5) - mOffsetY)/mScale
         return boardX, boardY
+    end
+
+    -- Converts a board space coordinate to a content space (stage) coordinate, taking scaling into account.
+    function o:boardToContent(x,y)
+        
+        local viewX = x * mScale + mOffsetX
+        local viewY = y * mScale + mOffsetY
+        return viewX + mViewGroup.x, viewY + mViewGroup.y
+--        return mTouchPlate:localToContent(viewX,viewY)
     end
     
     local mLastTopLeftQ = -1000.5
