@@ -96,7 +96,7 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         if options.debug then
             local text = display.newText(q..","..r, 0, 0, native.systemFont, board.view.hexSize/2.5)
             text.alpha = 0.6
-            text.translate(0, elevationPixels)
+            text:translate(0, elevationPixels)
             mGroup:insert(text)
         end
         
