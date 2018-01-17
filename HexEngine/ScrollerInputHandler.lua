@@ -1,5 +1,7 @@
 print("Loading ScrollerInputHandler...")
 
+local MultitouchTracker = require("HexEngine.MultitouchTracker")
+
 local ScrollerInputHandler = {}
 
 -- Declare globals to be used by this package
@@ -48,7 +50,11 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
  
     local hexView = hexView
 
-    -- The set input handler that will be called on touch events
+    -- Setup the multitouch tracker
+    local tracker = MultitouchTracker:new()
+    tracker.multitouch = o
+    hexView:addTouchEventListener(tracker)
+    
     local mInputHandler = nil
     
     local mTouchX = 0
@@ -221,7 +227,7 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
         local offsetX, offsetY = hexView:getBoardOffset()
         offsetX = offsetX + midDx
         offsetY = offsetY + midDy
---      print("Drag delta: "..dx..","..dy.." offset: "..mOffsetx..","..mOffsety.." at hex("..q..","..r..")" .. " cord("..x..","..y..")")
+        --print("Drag delta: "..midDx..","..midDy.." offset: "..offsetX..","..offsetY.." at hex("..q..","..r..")" .. " cord("..x..","..y..")")
         hexView:setBoardOffset(offsetX,offsetY)
     end
 
@@ -245,12 +251,32 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
         end
     end
 
+    function o:multitouch(event, touchID)
+--        print("ScrollerInputHandler: multitouch event! ", touchID, event.phase)
+
+        -- Convert touch event coordinates to board coordinates (takes scaling into account)
+        local boardX, boardY = hexView:contentToBoard(event.x, event.y)
+
+        -- Get touched tile coordinate
+        local q,r = hexView:boardToTile(boardX, boardY)
+        
+        if ( event.phase == "began" ) then
+            o:onHexTouchBegin(q,r,event.x,event.y,touchID)
+        elseif ( event.phase == "moved") then
+            o:onHexTouchMove(q,r,event.x,event.y,touchID)
+        elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
+            o:onHexTouchEnd(q,r,event.x,event.y,touchID)
+        end
+
+        return true
+    end
+    
     function o:setInputHandler(ih)
         if ih == nil then mInputHandler = nil end
         if type(ih) ~= "table" then error("inputHandler is of invalid type " .. type(ih), 2) end
         mInputHandler = ih
     end
-    
+           
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
     setmetatable(proxy, {

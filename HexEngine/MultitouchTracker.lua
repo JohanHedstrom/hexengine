@@ -14,6 +14,8 @@ local display = display
 local options = options
 local tostring = tostring
 
+local isDevice = system.getInfo("environment") == "device"
+
 -- Forbid access of all other globals
 local _P = {}
 setmetatable(_P, {
@@ -53,12 +55,7 @@ function MultitouchTracker:new()
         
         local id = nextTrackerId
         nextTrackerId = nextTrackerId + 1
-        
-        -- Convert coordinates to board coordinates (0,0 in upper left corner) and account for scaling
---        local boardX, boardY = o:contentToBoard(event.x, event.y)
-        
---        local q,r = o:boardToTile(boardX, boardY)
-        
+                
         local function propagateEvent(event, id)
             if o.multitouch ~= nil then 
                 if type(o.multitouch) == "table" and type(o.multitouch.multitouch) == "function" then
@@ -81,13 +78,15 @@ function MultitouchTracker:new()
                 circle.y = event.y
                 propagateEvent(event, id)
             elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
-                print("touch ended at "..event.x..","..event.y.." id: "..id)
                 display.getCurrentStage():setFocus(self,  nil )
 
-                if options.isDevice or not options.multitouchEmulation then
+                if isDevice or not options.multitouchEmulation then
                     circle:removeSelf(event.id)
                     propagateEvent(event, id)
-                end    
+                    print("touch ended at "..event.x..","..event.y.." id: "..id)
+                else
+                    print("touch paused at "..event.x..","..event.y.." id: "..id)
+                end  
             end
             return true
 
@@ -96,11 +95,15 @@ function MultitouchTracker:new()
         function circle:tap(event)
             if event.numTaps == 2 then
                 self:removeSelf()
+                -- Simulate a touch ended event and propagate it
+                event.phase = "ended"
+                print("touch ended after double tap at "..event.x..","..event.y.." id: "..id, event.phase)
                 propagateEvent(event, id)
+                return false
             end
         end
         
-        if not options.isDevice then 
+        if not isDevice then 
             circle:addEventListener("tap")
         end
             

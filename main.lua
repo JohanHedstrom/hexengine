@@ -5,7 +5,6 @@ system.activate("multitouch")
 -- Global Options
 options = {} 
 options.multitouchEmulation = false
-options.isDevice = system.getInfo("environment") == "device"
 options.debug = false
 
 -- Sleep function for debugging purposes

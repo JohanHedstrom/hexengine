@@ -72,7 +72,7 @@ function LevelIsland:new(board)
         generateMountain(-4,8,2)
 --]]       
 
-        generateMountain(0,0,6)
+        generateMountain(0,0,10)
  
         -- Generate tiles depending on heightmap
         print("...", heightMap.size)

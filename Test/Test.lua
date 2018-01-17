@@ -49,7 +49,6 @@ function Test:new(group, width, height)
     -- The hex view for the Test instance (created after the proxy is created)
     local hexView = HexView.createView(group, width, height, isPointyTop, 50/math.cos(math.pi/6), squishFactor)
     local inputHandler = ScrollerInputHandler:new(hexView)
-    hexView:setInputHandler(inputHandler)
 	
     local mSelected = Map2D:new()
 		

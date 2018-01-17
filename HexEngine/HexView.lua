@@ -71,15 +71,13 @@ local accessTable = {
     contentToBoard = false,
     -- x,y tileToBoard(x,y) Converts the board space coordinate to a content (view) coordinate, taking board offset and scaling into account.
     boardToContent = false,
-    -- setInputHandler(inputHandler) Sets the input handler. The handler can implement the following callbacks
-    --     onHexTouchBegin(q,r,x,y,id) -- Called on first touch.
-    --     onHexTouchMove(q,r,x,y,id)  -- Called on touch move.
-    --     onHexTouchEnd(q,r,x,y,id)   -- Called when finger is lifted.
-    --       q,r The coordinate of the hex
-    --       x,y The coordinate in content space
-    --       id The id of the multitouch event
-    setInputHandler = false,
-    -- setVisibilityHandler(inputHandler) Sets the visibility handler. The handler can implement the following callbacks
+    -- addTouchEventListener(touchListener) Sets an event listener for board touch events. Works equivalently to 
+    -- dispObj:addEventListener("touch", touchListener). Note that the origin of the touch event is an implementation detail and can change.
+    addTouchEventListener = false,
+    -- removeTouchEventListener(touchListener) Removes an event listener for board touch events. Works equivalently to 
+    -- dispObj:removeEventListener("touch", touchListener).
+    removeTouchEventListener = false,
+    -- setVisibilityHandler(visibilityHandler) Sets the visibility handler. The handler can implement the following callbacks
     --     onHexVisibility(q,r,visible) -- Called with visible = true when hex q,r becomes visible 
     --                                     in the view. When a hex is not visible anymore it is 
     --                                     called again with visible = false
@@ -142,9 +140,6 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     local mOffsetX = 0
     local mOffsetY = 0
         
-    -- The set input handler that will be called on board touch events
-    local inputHandler = nil
-
     -- The visibility handler that will be called when hexes are visible/not visible any more in the view
     local visibilityHandler = nil
     
@@ -177,81 +172,6 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
     local mTouchPlate = display.newRect(mViewGroup,0,0,width,height)
     mTouchPlate.anchorX = 0; mTouchPlate.anchorY = 0;
     mTouchPlate:setFillColor( 0.0, 0.0, 0.0,1.0)
-            
-    -- The id of the next tracker
-    local nextTrackerId = 1
-        
-    -- Creates a multitouch tracker
-    local function newTracker(event)
-        local circle = display.newCircle(event.x, event.y, 30)
-        if options.debug == true or options.multitouchEmulation then
-            circle:setFillColor( 1.0, 1.0, 1.0, 0.5)
-        else
-            circle:setFillColor( 1.0, 1.0, 1.0, 0.0)
-        end    
-        
-        local id = nextTrackerId
-        nextTrackerId = nextTrackerId + 1
-        
-        -- Convert coordinates to board coordinates (0,0 in upper left corner) and account for scaling
-        local boardX, boardY = o:contentToBoard(event.x, event.y)
-        
-        local q,r = o:boardToTile(boardX, boardY)
-        
-        function circle:touch(event)
-            if ( event.phase == "began" ) then
-                display.getCurrentStage():setFocus(self, event.id)
-                print("touch begin "..event.x..","..event.y.." id: "..id)
-                if(inputHandler ~= nil and inputHandler.onHexTouchBegin ~= nil) then 
-                    inputHandler:onHexTouchBegin(q,r, event.x, event.y, id)
-                end
-            elseif ( event.phase == "moved") then
-                --print("touch move "..event.x..","..event.y.." id: "..id)
-                circle.x = event.x
-                circle.y = event.y
-                if(inputHandler ~= nil and inputHandler.onHexTouchMove ~= nil) then 
-                    inputHandler:onHexTouchMove(q,r, event.x, event.y, id)
-                end
-            elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
-                print("touch ended at "..event.x..","..event.y.." id: "..id)
-                display.getCurrentStage():setFocus(self,  nil )
-
-                if options.isDevice or not options.multitouchEmulation then
-                    circle:removeSelf(event.id)
-                    if(inputHandler ~= nil and inputHandler.onHexTouchEnd ~= nil) then 
-                        inputHandler:onHexTouchEnd(q,r, event.x, event.y, id)
-                    end
-                end    
-            end
-            return true
-        end
-
-        function circle:tap(event)
-            if event.numTaps == 2 then
-                self:removeSelf()
-                if(inputHandler ~= nil and inputHandler.onHexTouchEnd ~= nil) then 
-                    inputHandler:onHexTouchEnd(q,r, event.x, event.y,id)
-                end
-            end
-        end
-        
-        if not options.isDevice then 
-            circle:addEventListener("tap")
-        end
-            
-        circle:addEventListener("touch")
-        circle:touch(event)
-    end
-
-    local function onPlateTouch(event)
-        if ( event.phase == "began" ) then
-            newTracker(event)
-            print("created tracker object at "..event.x..","..event.y.." id: ".. tostring(event.id))
-            return true
-        end 
-    end    
-    
-    mTouchPlate:addEventListener("touch", onPlateTouch)
     
     mViewGroup:insert(mBoard)
     
@@ -542,12 +462,14 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
         return offsetX, offsetY
     end
     
-    function o:setInputHandler(ih)
-        if ih == nil then inputHandler = nil end
-        if type(ih) ~= "table" then error("inputHandler is of invalid type " .. type(ih), 2) end
-        inputHandler = ih
+    function o:addTouchEventListener(touchListener)
+        mTouchPlate:addEventListener("touch", touchListener)
     end
 
+    function o:removeTouchEventListener(touchListener)
+        mTouchPlate:removeEventListener("touch", touchListener)
+    end
+ 
     function o:setVisibilityHandler(bh)
         if bh == nil then visibilityHandler = nil end
         if type(bh) ~= "table" then error("visibilityHandler is of invalid type " .. type(bh), 2) end

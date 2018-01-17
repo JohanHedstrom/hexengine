@@ -54,7 +54,6 @@ function FiveInARow:new(group, width, height)
     local hexView = HexView.createView(group, width, height, true, size)
     print(hexView:toString())
     local inputHandler = ScrollerInputHandler:new(hexView)
-    hexView:setInputHandler(inputHandler)
 
     -- Keeps track of if it is whites turn or blacks
     local mWhiteTurn = true

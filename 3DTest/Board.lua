@@ -60,7 +60,6 @@ function Board:new(view)
     
     -- Set up tap handler
     local mInputHandler = ScrollerInputHandler:new(view)
-    view:setInputHandler(mInputHandler)
 
     function o:getTile(q,r)
         local tile = mTiles:get(q,r)
