@@ -27,16 +27,16 @@ setfenv(1,_P)
 -- Expose public interface with controlled read and/or write access 
 -- Key present and false means read only, true means read/write
 local accessTable = {
-    -- Callbacks from the view
-    onHexVisibility = false,
-    onHexTouchBegin = false,
-    onHexTouchMove = false,
-    onHexTouchEnd = false,
-
     -- setInputHandler(inputHandler) Sets the input handler. The handler can implement the following callbacks
     --     onHexTap(q,r,x,y) -- Called when a hex q,r is tapped. x,y is the content space coordinate of 
-    ---    the tap
+    --     the tap
     setInputHandler = false,
+    -- setOrigin(tile) Sets origin to the provided tile. Will be cleared automatically when tracker (finger) count goes down 
+    -- to zero. Useful if the tile that should get a tap event, for instance, isn't necessarily the tile that is 
+    -- under the board coordinate. This can be the case for instance if it is elevated.
+    setOrigin = false,
+    -- tile getOrigin() Gets the origin tile.
+    getOrigin = false,
 }
 
 function ScrollerInputHandler:new(hexView, minScale, maxScale)
@@ -50,6 +50,9 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
  
     local hexView = hexView
 
+    -- The current tile that is set as origin, or nil
+    local mOrigin = nil
+    
     -- Setup the multitouch tracker
     local tracker = MultitouchTracker:new()
     tracker.multitouch = o
@@ -72,9 +75,20 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
     local pinchID1 = 0
     local pinchID2 = 0
     
+    function o:setOrigin(tile)
+        mOrigin = tile
+        print("Origin set to ", tile.q, tile.r)
+    end
+    
+    function o:getOrigin()
+        return mOrigin
+    end
+    
     local function trackerCountChange()
         print("Tracker count changed. Tracker count: "..trackersCount)
         if trackersCount == 0 then 
+            mOrigin = nil
+            print("Origin cleared")
             if trackersMidpointDebugMarker ~= nil then 
                 trackersMidpointDebugMarker:removeSelf()
                 trackersMidpointDebugMarker = nil
@@ -232,23 +246,22 @@ function ScrollerInputHandler:new(hexView, minScale, maxScale)
     end
 
     function o:onHexTouchEnd(q,r,x,y,id) 
-
         local tracker = trackers[id]
         if tracker == nil then 
             print("Ignoring hexTouchEnd call for id "..id..". No active tracker.")
             return
         end
-   
-        trackers[id] = nil
-        trackersCount = trackersCount - 1
-        trackerCountChange()
-    
+
         -- Check if a tap was made (touch end is very close to touch start)
         if (x >= (mTouchX-5) and x <= (mTouchX+5)) and (y >= (mTouchY-5) and y <= (mTouchY+5)) then
             if mInputHandler ~= nil and mInputHandler.onHexTap ~= nil then
                 mInputHandler:onHexTap(q,r,x,y)
             end
         end
+        
+        trackers[id] = nil
+        trackersCount = trackersCount - 1
+        trackerCountChange()   
     end
 
     function o:multitouch(event, touchID)

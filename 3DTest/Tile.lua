@@ -54,9 +54,43 @@ function Tile:getElevationPixels(level)
     else return level * -12 + 5 end
 end
 
+
+local function createHitShape(isPointyTop, size, squishFactor)
+
+    local THIRTY_DEGGREES_RAD = math.pi/180*30
+
+	if squishFactor == nil then squishFactor = 1 end 
+    local vertices = {}
+
+    local group = display.newGroup()
+    
+    for i=0,5,1 do
+        local angle = 2 * math.pi / 6 * (i + 0.5) + THIRTY_DEGGREES_RAD
+        local x = size * math.cos(angle)
+        local y = size * math.sin(angle)
+        --local circle = display.newCircle(group, x, y, 5)
+        --if i==0 then circle:setFillColor(1,0.3,0.3) end
+        vertices[i*2+1] = x
+        vertices[i*2+2] = y * squishFactor
+    end    
+
+    local poly = display.newPolygon(0, 0, vertices )
+    group:insert(poly)
+    poly:setFillColor(0.3,0.3,0.3)
+    poly:setStrokeColor(0.5,0.5,0.5)
+    poly.strokeWidth = 2
+    poly.alpha = 0.0
+    poly.isHitTestable = true
+    poly:toBack()
+
+    return group
+end
+
+
 -- Creates a tile that belongs to the provided board and is placed at q,r, with the provided terrain
 function Tile:new(board, q, r, terrain, elevationLevel)
     local o = {}
+    local proxy = {}
     o.elevationLevel = elevationLevel
     o.q = q
     o.r = r
@@ -74,12 +108,30 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         
     local function createUI()
         mGroup = display.newGroup()
+        
         local bgImage = display.newImageRect(mGroup, terrain.imagePath, terrain.imageWidth, terrain.imageHeight)
+        --bgImage.alpha = .5
+        
+        -- Create the hit shape
+        local hitShape = createHitShape(board.view.hexIsPointyTop, board.view.hexSize, board.view.hexSquishFactor)
+        mGroup:insert(hitShape)
+        
         mSelectionOverlay = display.newImageRect(mGroup, "3DTest/Resources/selectedOverlay.png", 117, 167 )
+        
+        local function touch(event)
+            print("touch!", q, r, event)
+            if board.inputHandler:getOrigin() == nil then 
+                board.inputHandler:setOrigin(proxy)
+            end
+            return false
+        end
+        
+        hitShape:addEventListener("touch", touch)
         
         -- Take corrections and elevation into account
         local elevationPixels = Tile:getElevationPixels(elevationLevel)
         bgImage:translate(terrain.correctionX, terrain.correctionY + elevationPixels)
+        hitShape:translate(0,elevationPixels)
         
         -- Add the selection overlay and set its starting visibility
         if mSelected then mSelectionOverlay.isVisible = true else mSelectionOverlay.isVisible = false end
@@ -161,7 +213,6 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     
         
     -- Return proxy that enforce access only to public members and methods
-    local proxy = {}
     setmetatable(proxy, {
         __index = function(t,k) 
             if accessTable[k] ~= nil

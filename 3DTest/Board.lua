@@ -40,6 +40,8 @@ local accessTable = {
     view = false,
     -- setMapGenerator(generator) If set, generator:generateTile(q,r) will be called if Board:getTile() is called for a non-existing tile.
     setMapGenerator = false,
+    -- inputHandler The input handler that takes care of all touch events to pan and zoom the map, etc.
+    inputHandler = false,
 }
 
 -- Creates a Board on which manages tiles, units, etc. The visual representation is managed by the 
@@ -59,7 +61,7 @@ function Board:new(view)
     local mMapGenerator = nil
     
     -- Set up tap handler
-    local mInputHandler = ScrollerInputHandler:new(view)
+    o.inputHandler = ScrollerInputHandler:new(view)
 
     function o:getTile(q,r)
         local tile = mTiles:get(q,r)
@@ -152,6 +154,7 @@ function Board:new(view)
     -- Tap handler
 	local mTapHandler = {}
 	function mTapHandler:onHexTap(q,r,x,y)
+--[[    
         local boardX, boardY = view:contentToBoard(x,y);
         local tq, tr, elevPixels
         
@@ -183,20 +186,31 @@ function Board:new(view)
         end
         
 --        print("tap:", q, r, " checked: ",q, r+1, elevPixels, "result: ", tq, tr)
-        
-		print("Tap on: ", q, r)
-        
-        -- Redirect to focus object if any
-        if mFocus ~= nil then return mFocus:onTap(q,r) end
-
-        -- Otherwise redirect to the tapped tile
-        local tile = o:getTile(q,r);
-        if tile ~= nil then
-            tile:onTap(q,r)
+]]--        
+        -- Get the origin tile set when originally touching the tile. Use this as the tap tile coordinate 
+        -- since the calculated tile coordinate from the board coordinate is not valid because of tile 
+        -- elevation.
+        local origin = o.inputHandler:getOrigin()
+        if origin ~= nil then 
+            print("Tap on: ", q, r, "origin: ", origin.q, origin.r)
+        else
+            print("Tap on: ", q, r, "(no origin)")
         end
+        
+        if origin ~= nil then
+            -- Redirect to focus object if any
+            if mFocus ~= nil then return mFocus:onTap(origin.q, origin.r) end
+
+            -- Otherwise redirect to the tapped tile
+            local tile = o:getTile(origin.q, origin.r);
+            if tile ~= nil then
+                tile:onTap()
+            end
+        end
+        
     end
     
-	mInputHandler:setInputHandler(mTapHandler)    
+	o.inputHandler:setInputHandler(mTapHandler)    
 
     function o:setFocus(obj)
         mFocus = obj
