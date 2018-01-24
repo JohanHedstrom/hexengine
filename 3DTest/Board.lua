@@ -52,6 +52,11 @@ function Board:new(view)
     
     o.view = view
     
+    -- Allow a hex to undershoot a maximum of one hex height. Needed so that tiles above transparent tiles 
+    -- (water for instance) aren't flagged as no longer visible when in fact they are still visible because 
+    -- of the undershoot.    
+    view:setMaxTileUndershoot(view.hexHeight)
+    
     local mTiles = Map2D:new()
 
     -- The object currently in focus (will receive all tap events) or nil
