@@ -51,6 +51,8 @@ local accessTable = {
     setHex = false,
     -- removeHex(q,r) Removes the display object for hex q,r from the board.
     removeHex = false,
+    -- setMaxTileOvershoot(overshoot) Sets the maximum height of a tile that overshoots the tile height, taking units, etc into account. Defaults to 0. Must be set to a sufficiently large value to make sure that tiles visual because of overshoot aren't flagged as no longer visible.
+    setMaxTileOvershoot = false,
     -- setBoardOffset(x,y) Sets the offset of the board (i.e. board.x and board.y)
     setBoardOffset = false,
     -- getBoardOffset() Returns offsetX,offsetY
@@ -102,7 +104,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 	
 	-- defaults
 	if squishFactor == nil then squishFactor = 1 end
-
+    
     -- value checking
     if type(group) ~= "table" then error("createView: group is of invalid type " .. type(group), 2) end 
     if type(width) ~= "number" then error("createView: width is of invalid type " .. type(width), 2) end 
@@ -115,6 +117,8 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 
     o.hexIsPointyTop = isPointyTop
     o.hexSize = hexSize;
+    
+    local mOvershoot = 0 
     
     if isPointyTop then
         o.hexHeight = o.hexSize * 2
@@ -238,7 +242,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 		
 			-- Account for the part of the board that fits in the view after scaling
 			local width = mViewWidth/mScale;
-			local height = (mViewHeight/mScale)
+			local height = ( (mViewHeight + mOvershoot)/mScale)
 		
 			-- The hex at the top left of the visible area 
 			local q,r = self:boardToTile((0-mOffsetX)/mScale,(0-mOffsetY)/mScale)
@@ -287,7 +291,7 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
 			local topRightX = (0-mOffsetX+mViewWidth)/mScale
 			local topRightY = (0-mOffsetY)/mScale
 			local bottomLeftX = (0-mOffsetX)/mScale
-			local bottomLeftY = (0-mOffsetY+mViewHeight)/mScale
+			local bottomLeftY = (0-mOffsetY+mViewHeight+mOvershoot)/mScale
 			local qStart,rStart = self:boardToTile(topRightX,topRightY)
 
 			local q = qStart
@@ -389,6 +393,11 @@ local function createView(group, width, height, isPointyTop, hexSize, squishFact
             print("Removed overwritten hex at "..q..","..r.." board " .. x ..",".. y)
         end
         mHexes:set(q,r,hex)
+        mIsDirty = true
+    end
+    
+    function o:setMaxTileOvershoot(overshoot)
+        mOvershoot = overshoot
         mIsDirty = true
     end
     

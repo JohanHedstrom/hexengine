@@ -49,6 +49,7 @@ function Test:new(group, width, height)
     -- The hex view for the Test instance (created after the proxy is created)
     local hexView = HexView.createView(group, width, height, isPointyTop, 50/math.cos(math.pi/6), squishFactor)
     local inputHandler = ScrollerInputHandler:new(hexView)
+    hexView:setMaxTileOvershoot(50)
 	
     local mSelected = Map2D:new()
 		
@@ -170,7 +171,7 @@ end
 
 layout()
 
-game:setScale(1.0)
+game:setScale(0.6)
 game:center(0,0)
 
 -- The resize event handler
