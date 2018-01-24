@@ -2,7 +2,7 @@ print("Loading Test...")
 
 -- Test settings
 local squishFactor = 0.85
-local isPointyTop = false
+local isPointyTop = true
 
 local HexView = require("HexEngine.HexView")
 local HexUtils = require("HexEngine.HexUtils")
@@ -50,6 +50,7 @@ function Test:new(group, width, height)
     local hexView = HexView.createView(group, width, height, isPointyTop, 50/math.cos(math.pi/6), squishFactor)
     local inputHandler = ScrollerInputHandler:new(hexView)
     hexView:setMaxTileOvershoot(50)
+    hexView:setMaxTileUndershoot(50)
 	
     local mSelected = Map2D:new()
 		
