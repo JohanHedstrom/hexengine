@@ -62,6 +62,9 @@ function Board:new(view)
     
     -- Set up tap handler
     o.inputHandler = ScrollerInputHandler:new(view)
+    
+    -- The maximum elevation level of a tile placed so far
+    local mMaxElevationLevel = 0
 
     function o:getTile(q,r)
         local tile = mTiles:get(q,r)
@@ -78,6 +81,15 @@ function Board:new(view)
         if tile == nil then return end
         -- TODO: handle replaced tiles correctly
         mTiles:set(tile.q, tile.r, tile)
+        
+        if tile.elevationLevel > mMaxElevationLevel then
+            mMaxElevationLevel = tile.elevationLevel
+            print("New maximum elevation level of "..mMaxElevationLevel.." detected!")
+            -- Update the maximum tile overshoot to elevation pixels + a full hex height for any unit. This 
+            -- prevents tiles from being flagged as no longer visible when they are visible because of overshoot.
+            -- (*-1 because elevation pixels are actually negative)
+            view:setMaxTileOvershoot(Tile:getElevationPixels(mMaxElevationLevel)*-1 + view.hexHeight)
+        end
     end
     
     function o:setMapGenerator(generator)
