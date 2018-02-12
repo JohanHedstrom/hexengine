@@ -1,5 +1,8 @@
 print("Loading Tile...")
 
+local ResourceManager = require("3DTest.ResourceManager")
+
+
 local Tile = {}
 
 -- Declare globals to be used by this package
@@ -62,7 +65,7 @@ local function createHitShape(isPointyTop, size, squishFactor)
 	if squishFactor == nil then squishFactor = 1 end 
     local vertices = {}
 
-    local group = display.newGroup()
+    --local group = display.newGroup()
     
     for i=0,5,1 do
         local angle = 2 * math.pi / 6 * (i + 0.5) + THIRTY_DEGGREES_RAD
@@ -75,7 +78,7 @@ local function createHitShape(isPointyTop, size, squishFactor)
     end    
 
     local poly = display.newPolygon(0, 0, vertices )
-    group:insert(poly)
+    --group:insert(poly)
     poly:setFillColor(0.3,0.3,0.3)
     poly:setStrokeColor(0.5,0.5,0.5)
     poly.strokeWidth = 2
@@ -83,7 +86,8 @@ local function createHitShape(isPointyTop, size, squishFactor)
     poly.isHitTestable = true
     poly:toBack()
 
-    return group
+--    return group
+    return poly
 end
 
 
@@ -109,14 +113,16 @@ function Tile:new(board, q, r, terrain, elevationLevel)
     local function createUI()
         mGroup = display.newGroup()
         
-        local bgImage = display.newImageRect(mGroup, terrain.imagePath, terrain.imageWidth, terrain.imageHeight)
+        local bgImage = ResourceManager:create(terrain.resource)
+        mGroup:insert(bgImage)
         --bgImage.alpha = .5
         
         -- Create the hit shape
         local hitShape = createHitShape(board.view.hexIsPointyTop, board.view.hexSize, board.view.hexSquishFactor)
         mGroup:insert(hitShape)
         
-        mSelectionOverlay = display.newImageRect(mGroup, "3DTest/Resources/selectedOverlay.png", 117, 167 )
+        mSelectionOverlay = ResourceManager:create("SelectionOverlay")
+        mGroup:insert(mSelectionOverlay)
         
         local function touch(event)
             print("touch!", q, r, event)
@@ -130,12 +136,12 @@ function Tile:new(board, q, r, terrain, elevationLevel)
         
         -- Take corrections and elevation into account
         local elevationPixels = Tile:getElevationPixels(elevationLevel)
-        bgImage:translate(terrain.correctionX, terrain.correctionY + elevationPixels)
+        bgImage:translate(0, elevationPixels)
         hitShape:translate(0,elevationPixels)
         
         -- Add the selection overlay and set its starting visibility
         if mSelected then mSelectionOverlay.isVisible = true else mSelectionOverlay.isVisible = false end
-        mSelectionOverlay:translate(terrain.correctionX, terrain.correctionY + elevationPixels)
+        mSelectionOverlay:translate(0, elevationPixels)
         
         -- Add unit if any
         if mUnit ~= nil then 

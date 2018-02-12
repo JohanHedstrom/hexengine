@@ -72,7 +72,7 @@ function LevelIsland:new(board)
         generateMountain(-4,8,2)
 --]]       
 
-        generateMountain(0,0,10)
+        generateMountain(0,0,6)
  
         -- Generate tiles depending on heightmap
         print("...", heightMap.size)
@@ -92,6 +92,14 @@ function LevelIsland:new(board)
         
         local tile = mBoard:getTile(0,0)
         local unit = Unit:new(mBoard, UnitTypes:getType("LarvaSpear"))
+        unit:moveTo(tile)
+
+        tile = mBoard:getTile(1,0)
+        unit = Unit:new(mBoard, UnitTypes:getType("Larva"))
+        unit:moveTo(tile)
+
+        tile = mBoard:getTile(-1,0)
+        unit = Unit:new(mBoard, UnitTypes:getType("Butterfly"))
         unit:moveTo(tile)
         
         local enemyCount = 0

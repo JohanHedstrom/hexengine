@@ -23,41 +23,25 @@ setfenv(1,_P)
 
 -------- Water
 local terrainType = Terrain:new("Water")
-terrainType:setImagePath("3DTest/Resources/water.png")
-terrainType:setImageWidth(139)
-terrainType:setImageHeight(167)
-terrainType:setCorrectionX(0)
-terrainType:setCorrectionY(8)
+terrainType:setResource("TileWater")
 terrainType:setMovementCost(1)
 types["Water"] = terrainType
 
 -------- Plain
 local terrainType = Terrain:new("Plain")
-terrainType:setImagePath("3DTest/Resources/plain.png")
-terrainType:setImageWidth(137)
-terrainType:setImageHeight(167)
-terrainType:setCorrectionX(0)
-terrainType:setCorrectionY(8)
+terrainType:setResource("TilePlain")
 terrainType:setMovementCost(1)
 types["Plain"] = terrainType
 
 -------- Desert
 local terrainType = Terrain:new("Desert")
-terrainType:setImagePath("3DTest/Resources/desert.png")
-terrainType:setImageWidth(139)
-terrainType:setImageHeight(167)
-terrainType:setCorrectionX(0)
-terrainType:setCorrectionY(8)
+terrainType:setResource("TileSand")
 terrainType:setMovementCost(1)
 types["Desert"] = terrainType
 
 -------- Stone
 local terrainType = Terrain:new("Stone")
-terrainType:setImagePath("3DTest/Resources/stone.png")
-terrainType:setImageWidth(139)
-terrainType:setImageHeight(167)
-terrainType:setCorrectionX(0)
-terrainType:setCorrectionY(8)
+terrainType:setResource("TileStone")
 terrainType:setMovementCost(1)
 types["Stone"] = terrainType
 

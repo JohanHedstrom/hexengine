@@ -1,5 +1,6 @@
 local HexUtils = require("HexEngine.HexUtils")
 local Map2D = require("HexEngine.Map2D")
+local ResourceManager = require("3DTest.ResourceManager")
 
 print("Loading Unit...")
 
@@ -103,11 +104,9 @@ function Unit:new(board, unitType)
         if mGroup ~= nil then return mGroup end
     
         mGroup = display.newGroup()
-        local image = display.newImageRect(mGroup, unitType.imagePath, unitType.imageWidth, unitType.imageHeight)
+        local image = ResourceManager:create(unitType.resource);
+        mGroup:insert(image)
          
-        -- Take corrections into account
-        image:translate(unitType.correctionX, unitType.correctionY)
-        
         return mGroup
     end
     

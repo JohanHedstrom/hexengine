@@ -14,6 +14,7 @@ local Unit = require("3DTest.Unit")
 local UnitTypes = require("3DTest.UnitTypes")
 local LevelRandom = require("3DTest.LevelRandom")
 local LevelIsland = require("3DTest.LevelIsland")
+local ResourceManager = require("3DTest.ResourceManager")
 
 local ThreeDTest = {}
 
@@ -55,6 +56,21 @@ view.width = 100
 view.anchorX = 0
 view.anchorY = 0
 view.anchorChildren = false
+
+--Install all resources
+ResourceManager:addImageResource("TilePlain", "3DTest/Resources/plain.png", 137, 167, 0, 8)
+ResourceManager:addImageResource("TileWater", "3DTest/Resources/water.png", 139, 167, 0, 8)
+ResourceManager:addImageResource("TileSand", "3DTest/Resources/desert.png", 139, 167, 0, 8)
+ResourceManager:addImageResource("TileStone", "3DTest/Resources/stone.png", 139, 167, 0, 8)
+
+ResourceManager:addImageResource("UnitSlime", "3DTest/Resources/Units/slime.png", 78, 51, -4, -10)
+ResourceManager:addImageResource("UnitSlimeFloating", "3DTest/Resources/Units/slime_floating.png", 69, 95, 0, -35)
+ResourceManager:addImageResource("UnitLarva", "3DTest/Resources/Units/larva.png", 77, 46, 0, -8)
+ResourceManager:addImageResource("UnitLarvaSpear", "3DTest/Resources/Units/larva_spear.png", 107, 95, 6, -30)
+ResourceManager:addImageResource("UnitButterfly", "3DTest/Resources/Units/butterfly.png", 158, 113, -5, -47)
+
+ResourceManager:addImageResource("SelectionOverlay", "3DTest/Resources/selectedOverlay.png", 117, 167, 0, 8)
+
 
 function ThreeDTest:new(group, width, height)
     local o = {}

@@ -24,22 +24,9 @@ setfenv(1,_P)
 local accessTable = {
     -- String with the unit type name
     name = false,
-    setName = false,
-    -- String with the path to the image for the unit.
-    imagePath = false,
-    setImagePath = false,
-    -- Integer with the width of image for the unit.
-    imageWidth = false,
-    setImageWidth = false,
-    -- Integer with the height of image for the unit.
-    imageHeight = false,
-    setImageHeight = false,
-    -- Number with the an optional correction in x of the unit image in pixels.
-    correctionX = false,
-    setCorrectionX = false,
-    -- Number with the an optional correction in y of the unit image in pixels.
-    correctionY = false,
-    setCorrectionY = false,
+    -- String with the name of the display resource for the unit.
+    resource = false,
+    setResource = false,
     -- The number of tiles this unit type can move.
     movement = false,
     setMovement = false,
@@ -51,31 +38,11 @@ function UnitType:new(name)
     local o = {}
 
 	o.name = name
-	o.imagePath = ""
-    o.imageWidth = 0
-    o.imageHeight = 0
-	o.correctionX = 0
-	o.correctionY = 0
+	o.resource = ""
     o.movement = 0
 	    
-    function o:setImagePath(path)
-        o.imagePath = path;
-    end
-
-    function o:setImageWidth(width)
-        o.imageWidth = width;
-    end
-
-    function o:setImageHeight(height)
-        o.imageHeight = height;
-    end
-
-    function o:setCorrectionX(correctionX)
-        o.correctionX = correctionX;
-    end
-
-    function o:setCorrectionY(correctionY)
-        o.correctionY = correctionY;
+    function o:setResource(name)
+        o.resource = name;
     end
 
     function o:setMovement(movement)

@@ -23,43 +23,33 @@ setfenv(1,_P)
 
 -------- Slime
 local unitType = UnitType:new("Slime")
-unitType:setImagePath("3DTest/Resources/Units/slime.png")
-unitType:setImageWidth(78)
-unitType:setImageHeight(51)
-unitType:setCorrectionX(-4)
-unitType:setCorrectionY(-10)
+unitType:setResource("UnitSlime")
 unitType:setMovement(1)
-types["Slime"] = unitType;
+types[unitType.name] = unitType;
 
 -------- SlimeFloating
 local unitType = UnitType:new("SlimeFloating")
-unitType:setImagePath("3DTest/Resources/Units/slime_floating.png")
-unitType:setImageWidth(69)
-unitType:setImageHeight(95)
-unitType:setCorrectionX(0)
-unitType:setCorrectionY(-35)
+unitType:setResource("UnitSlimeFloating")
 unitType:setMovement(2)
-types["SlimeFloating"] = unitType;
+types[unitType.name] = unitType;
 
 -------- Larva
-unitType = UnitType:new("Larva")
-unitType:setImagePath("3DTest/Resources/Units/larva.png")
-unitType:setImageWidth(77)
-unitType:setImageHeight(46)
-unitType:setCorrectionX(0)
-unitType:setCorrectionY(-8)
-unitType:setMovement(5)
-types["Larva"] = unitType;
+local unitType = UnitType:new("Larva")
+unitType:setResource("UnitLarva")
+unitType:setMovement(1)
+types[unitType.name] = unitType;
 
 -------- LarvaSpear
-unitType = UnitType:new("LarvaSpear")
-unitType:setImagePath("3DTest/Resources/Units/larva_spear.png")
-unitType:setImageWidth(107)
-unitType:setImageHeight(95)
-unitType:setCorrectionX(6)
-unitType:setCorrectionY(-30)
+local unitType = UnitType:new("LarvaSpear")
+unitType:setResource("UnitLarvaSpear")
 unitType:setMovement(2)
-types["LarvaSpear"] = unitType;
+types[unitType.name] = unitType;
+
+-------- Butterfly
+local unitType = UnitType:new("Butterfly")
+unitType:setResource("UnitButterfly")
+unitType:setMovement(3)
+types[unitType.name] = unitType;
 
 function UnitTypes:getType(name)
     local t = types[name];
