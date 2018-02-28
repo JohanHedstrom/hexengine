@@ -41,32 +41,32 @@ function LevelRandom:new(board)
     
     local function setup()
         local tile = o:generateTile(0,0);
-        mBoard:placeTile(tile)
+        mBoard:addTile(tile)
         local unit = Unit:new(mBoard, UnitTypes:getType("LarvaSpear"))
         unit:moveTo(tile)
 
         tile = o:generateTile(-3,0);
-        mBoard:placeTile(tile)
+        mBoard:addTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("Slime"))
         unit:moveTo(tile)
 
         tile = o:generateTile(1,2);
-        mBoard:placeTile(tile)
+        mBoard:addTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("SlimeFloating"))
         unit:moveTo(tile)
 
         tile = o:generateTile(3,-4);
-        mBoard:placeTile(tile)
+        mBoard:addTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("Slime"))
         unit:moveTo(tile)
 
         tile = o:generateTile(-2,2);
-        mBoard:placeTile(tile)
+        mBoard:addTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("Larva"))
         unit:moveTo(tile)
 
         tile = o:generateTile(3,-1);
-        mBoard:placeTile(tile)
+        mBoard:addTile(tile)
         unit = Unit:new(mBoard, UnitTypes:getType("Larva"))
         unit:moveTo(tile)
         

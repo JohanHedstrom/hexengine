@@ -87,7 +87,7 @@ function LevelIsland:new(board)
             else 
                 tile = Tile:new(mBoard, q, r, TerrainTypes:getType("Plain"), height)
             end    
-            mBoard:placeTile(tile)
+            mBoard:addTile(tile)
         end
         
         local tile = mBoard:getTile(0,0)
