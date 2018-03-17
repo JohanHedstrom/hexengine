@@ -20,6 +20,7 @@ local Runtime = Runtime
 local pairs = pairs
 local json = require( "json" )
 local string = string
+local next = next
 
 -- Forbid access of all other globals
 local _P = {}
@@ -44,10 +45,12 @@ local accessTableGroup = {
 	--     or set to false the group will generate errors if non-existent keys are accessed. If set to true accessing 
 	--     non-existent keys will return nil and assigning to them will create new group values.
     addGroup = false,
-    -- bool addValue(name) Adds a leaf with the provided name and value and returns true if successful.
+    -- bool addValue(name, value) Adds a leaf with the provided name and value and returns true if successful.
     addValue = false,
 	-- save() Persists all changes to the db in this group and all sub groups
 	save = false,
+    -- bool has(key) Returns true if there is a child (group or leaf) with the provided name.
+    has = false,
 }
 
 local function to_safe_json(str)
@@ -161,34 +164,44 @@ local function createGroup(db, name, parent, isDynamic)
 	end
 
 	function o:save()
-		print("Persisting group "..mFullName)
-
-		local sql_statement = ""
-		
-		-- Persist all dirty values
-		for k,v in pairs(mDirtySet) do
-			local value = mLeafs[k]
-			if v == "C" then 
-				sql_statement = sql_statement..[[INSERT INTO ]]..mFullName..[[ VALUES(']]..k..[[', ']]..to_safe_json(value)..[[');]] 
-			elseif v == "U" then 
-				sql_statement = sql_statement..[[UPDATE ]]..mFullName..[[ SET value=']]..to_safe_json(value)..[[' WHERE name=']]..k..[[';]] 
-				--print("Updated "..mFullName.."."..k.." with value \""..json.encode(value).."\"")
-			else error("Unsupported dirty type "..v) end
-		end
-		
-		--print(sql_statement)
-		
+        -- TODO: optimize so that children mark their parents as dirty when changed to avoid
+        --       having to save children unless the parent is marked as dirty
+    
 		-- Persist all sub groups recursively
 		for k,v in pairs(mGroups) do v:save() end
-		
-		exec(db, sql_statement)
-		
---		for row in db:nrows([[SELECT * FROM ]]..mFullName) do
---			print(row.name, row.value)
---		end
-		
-		mDirtySet = {}
+    
+        if next(mDirtySet) ~= nil then
+            local sql_statement = ""
+            
+            -- Persist all dirty values
+            for k,v in pairs(mDirtySet) do
+                local value = mLeafs[k]
+                if v == "C" then 
+                    sql_statement = sql_statement..[[INSERT INTO ]]..mFullName..[[ VALUES(']]..k..[[', ']]..to_safe_json(value)..[[');]] 
+                elseif v == "U" then 
+                    sql_statement = sql_statement..[[UPDATE ]]..mFullName..[[ SET value=']]..to_safe_json(value)..[[' WHERE name=']]..k..[[';]] 
+                    --print("Updated "..mFullName.."."..k.." with value \""..json.encode(value).."\"")
+                else error("Unsupported dirty type "..v) end
+            end
+
+            --print(sql_statement)
+            exec(db, sql_statement)
+            
+    --		for row in db:nrows([[SELECT * FROM ]]..mFullName) do
+    --			print(row.name, row.value)
+    --		end
+            mDirtySet = {}
+            print("Persisted group "..mFullName)
+        end    
 	end
+    
+    function o:has(k)
+        local v = mGroups[k]
+        if v ~= nil then return true end
+        v = mLeafs[k]
+        if v ~= nil then return true end
+        return false
+    end
 	
 	-- Marks a leaf dirty (called by the leaf, not part of the public interface)
 	function o:markLeafDirty(leafName)
