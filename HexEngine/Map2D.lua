@@ -40,20 +40,36 @@ local function coordToString(x,y)
 	-- which is not a good thing.
 	if x == 0 then x = 0 end
 	if y == 0 then y = 0 end
-	return ""..x..","..y
+    
+    -- And replace all - with m since - is not valid in an identifier which cause problems 
+    -- when restoring a persisted value
+	return string.gsub(""..x.."_"..y, "-", "m")
 end
 
 local function stringToCoord(str)
-	local commaIndex = string.find(str, ",")
+	local str = string.gsub(str, "m", "-")
+    local commaIndex = string.find(str, "_")
 	local x = string.sub(str,1,commaIndex-1)
 	local y = string.sub(str,commaIndex+1)
 	return tonumber(x),tonumber(y)
 end
 
+-- Create a new Map2D. Optionally back it up with a persistent store group. 
 function Map2D:new(store)
     local o = {}
-	o.data = store or {}
-    o.size = 0
+    
+    if store ~= nil then
+        if type(store) ~= "table" or store.getValueCount == nil then 
+            error("Provided store must be a persistent store group.", 2)
+        end
+        o.data = store
+        o.size = store:getValueCount()
+        print("Created Map2D backed up from a persistent store of size ".. o.size)
+    else    
+        o.data = {}
+        o.size = 0
+    end
+    
     
     function o:get(x,y)
         if type(x) ~= "number" then error("x is of invalid type " .. type(x), 2) end 

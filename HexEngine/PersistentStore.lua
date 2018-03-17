@@ -51,6 +51,8 @@ local accessTableGroup = {
 	save = false,
     -- bool has(key) Returns true if there is a child (group or leaf) with the provided name.
     has = false,
+    -- int getValueCount Retuns the number of values
+    getValueCount = false,
 }
 
 local function to_safe_json(str)
@@ -111,6 +113,7 @@ local function createGroup(db, name, parent, isDynamic)
 	
 	-- The set of leaf values that belong to this group. Leaf name as key and Leaf as value.
 	local mLeafs = {}
+    local mLeafCount = 0
 	
 	-- Adds a leaf with the provided initial value.
 	function o:addValue(name, value)
@@ -126,9 +129,12 @@ local function createGroup(db, name, parent, isDynamic)
 			return false
 		end
 		
+        print("Added value "..mFullName.."."..name.."="..value)
+        
 		-- Add the leaf
 		mLeafs[name] = value
-	
+        mLeafCount = mLeafCount + 1
+    
 		-- Add a create entry in the dirty set
 		mDirtySet[name] = "C"
 		
@@ -202,6 +208,10 @@ local function createGroup(db, name, parent, isDynamic)
         if v ~= nil then return true end
         return false
     end
+    
+    function o:getValueCount()
+        return mLeafCount
+    end
 	
 	-- Marks a leaf dirty (called by the leaf, not part of the public interface)
 	function o:markLeafDirty(leafName)
@@ -228,6 +238,7 @@ local function createGroup(db, name, parent, isDynamic)
 			else
 				print("Restored leaf "..mFullName.."."..name.." to value "..row.value)
 				mLeafs[name] = from_safe_json(row.value)
+                mLeafCount = mLeafCount + 1
 			end
 		end
 		print("Restored group "..mFullName.. " isDynamic: "..((isDynamic and "true") or "false")) 
@@ -260,10 +271,13 @@ local function createGroup(db, name, parent, isDynamic)
 				error("Attempt to set reserved field " .. k .. "=" .. (v or "nil") .. " in Group " .. mFullName, 2)
             elseif leafValue == nil and isDynamic == true then
 				mLeafs[k] = v
+                mLeafCount = mLeafCount + 1
 				mDirtySet[k] = "C"
+                print("Dynamically created value " .. k .. "=" .. (v or "nil") .. " in Group " .. mFullName)
 			elseif (leafValue ~= nil) then
 				mLeafs[k] = v
 				mDirtySet[k] = "U"
+                print("Updated value " .. k .. "=" .. (v or "nil") .. " in Group " .. mFullName)
             else
                 error("Attempt to set key " .. k .. "=" .. (v or "nil") .. " in Group " .. mFullName, 2)
             end
