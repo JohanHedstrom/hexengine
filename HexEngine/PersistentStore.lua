@@ -51,8 +51,10 @@ local accessTableGroup = {
 	save = false,
     -- bool has(key) Returns true if there is a child (group or leaf) with the provided name.
     has = false,
-    -- int getValueCount Retuns the number of values
+    -- int getValueCount Retuns the number of values.
     getValueCount = false,
+    -- getValuePairs() Returns the result of the pairs() function for the values table. Sub-groups are not included.
+    valuePairs = false,
 }
 
 local function to_safe_json(str)
@@ -211,6 +213,10 @@ local function createGroup(db, name, parent, isDynamic)
     
     function o:getValueCount()
         return mLeafCount
+    end
+
+    function o:valuePairs()
+        return pairs(mLeafs)
     end
 	
 	-- Marks a leaf dirty (called by the leaf, not part of the public interface)

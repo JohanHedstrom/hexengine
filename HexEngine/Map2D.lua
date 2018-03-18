@@ -109,7 +109,13 @@ function Map2D:new(store)
     end
 
     function o:iterator()
-        local i,is,cv = pairs(o.data)
+        local data = o.data
+        local i,is,cv
+        if data.valuePairs then
+            i,is,cv = data:valuePairs()
+        else
+            i,is,cv = pairs(data)
+        end
 		local coordStr = cv
 		
 		return function()
