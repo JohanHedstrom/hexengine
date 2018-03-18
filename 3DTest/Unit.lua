@@ -15,7 +15,6 @@ local tostring = tostring
 local string = string
 local display = display
 local table = table
-local ipairs = ipairs
 local system = system
 
 
@@ -143,32 +142,6 @@ function Unit:new(board, unitType)
             board:setFocus(nil)
         end
         
---[[        if mSelection == nil then
-            mSelection = {}
-            for q,r in HexUtils.neighbors(mTile.q, mTile.r) do
-                local tile = board:getTile(q,r)
-                tile:onSelect(true)
-                table.insert(mSelection, tile)
-            end
-            mTile:onSelect(true)
-            board:setFocus(self)
-        elseif q == mTile.q and r == mTile.r then
-            board:setFocus(nil)
-            mTile:onSelect(false)
-            for i,tile in ipairs(mSelection) do
-                tile:onSelect(false)
-            end
-            mSelection = nil
-        else
-            mTile:onSelect(false)
-            for i,tile in ipairs(mSelection) do
-                tile:onSelect(false)
-                if tile.q == q and tile.r == r then o:moveTo(tile) end
-            end
-            mSelection = nil
-            board:setFocus(nil)
-        end
---]]
         return true
     end
     

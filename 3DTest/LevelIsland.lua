@@ -35,13 +35,16 @@ local accessTable = {
 }
 
 -- Creates a level responsible for generating tiles and units.
-function LevelIsland:new(board)
+function LevelIsland:new(board, data)
     local o = {}
     
     local mBoard = board
+
+    -- The persistent map data.
+    local map = nil;
     
     local function setup()
-    
+                
         -- Generate heightmap
         local heightMap = Map2D:new()
     
@@ -86,8 +89,9 @@ function LevelIsland:new(board)
                 tile = Tile:new(mBoard, q, r, TerrainTypes:getType("Desert"), height)
             else 
                 tile = Tile:new(mBoard, q, r, TerrainTypes:getType("Plain"), height)
-            end    
+            end
             mBoard:addTile(tile)
+            map:set(q,r,{name=tile.terrain.name, elevation=height})
         end
         
         local tile = mBoard:getTile(0,0)
@@ -127,7 +131,20 @@ function LevelIsland:new(board)
         return tile
     end
 
-    setup()
+    if not data:has("map") then
+        print("Creating new Island level.")
+        data:addGroup("map", true)
+        map = Map2D:new(data.map)
+        setup()
+    else
+        print("Resuming Island level.")
+        map = Map2D:new(data.map)
+        for q, r, v in map:iterator() do
+            print(q,r,v)
+            local tile = Tile:new(mBoard, q, r, TerrainTypes:getType(v.name), v.elevation)
+            mBoard:addTile(tile)
+        end
+    end
     
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}

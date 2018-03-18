@@ -75,11 +75,47 @@ ResourceManager:addImageResource("SelectionOverlay", "3DTest/Resources/selectedO
 function ThreeDTest:new(group, width, height)
     local o = {}
 
+    -- Restore the current session, if one is present. The session contains all the data needed to 
+    -- restore the current game, or a new session is created to keep track of all the needed data.
+    -- Anything non-transient regarding the current game session needs to be stored here.
+    local session, wasCreated = PersistentStore.open("session")
+
+    -- Make sure that the session data is saved whenever changed. Saving the persistent store when
+    -- there are no changes is cheap, so no problem doing it in enterFrame.
+    local function enterFrame(event)
+        session:save()
+    end
+
+    Runtime:addEventListener('enterFrame', enterFrame)
+    
+	if wasCreated then 
+		print("Starting new game session.")
+        
+        session:addValue("level", "Island")
+        session:addGroup("levelData")
+        
+    else
+        print("Resuming game session.")
+    end
+    
     -- The hex view for the Test instance (created after the proxy is created)
     local hexView = HexView.createView(group, width, height, false, 50/math.cos(math.pi/6), 0.8)
     
     local board = Board:new(hexView)
-    local level = LevelIsland:new(board)
+    
+    -- Restore the level (or reinitialize it)
+    local levelName = session.level
+    local level = nil
+    if levelName == "Island" then 
+        level = LevelIsland:new(board, session.levelData)
+    else 
+        error("Failed to restore session. No level generator with the name \"" .. levelName .. "\" is present.", 1)
+    end
+    
+    if level == nil then 
+        error("Failed to restore session. Failed to restore level \"" .. levelName .. "\".", 1)
+    end
+    
     board:setMapGenerator(level)
     
     function o:resize(w,h) 

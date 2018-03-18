@@ -44,10 +44,7 @@ local accessTable = {
 }
 
 -- Creates a Board which manages tiles, units, etc. The visual representation is managed by the 
--- View which displays part of the board. The provided level is responsible for populating the board 
--- with tiles, units, etc. The provided state is the persistent store state that was restored for 
--- the board. It is a persistent group with all the state needed to restore the Board, or it is 
--- empty.
+-- view which displays part of the board.
 function Board:new(view, state)
     local o = {}
     

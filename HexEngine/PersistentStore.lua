@@ -279,7 +279,8 @@ local function createGroup(db, name, parent, isDynamic)
 				mLeafs[k] = v
                 mLeafCount = mLeafCount + 1
 				mDirtySet[k] = "C"
-                print("Dynamically created value " .. k .. "=" .. (v or "nil") .. " in Group " .. mFullName)
+                print("dynamically created value", k, v, "in group " .. mFullName)
+                --print("Dynamically created value " .. k .. "=" .. (v or "nil") .. " in Group " .. mFullName)
 			elseif (leafValue ~= nil) then
 				mLeafs[k] = v
 				mDirtySet[k] = "U"
