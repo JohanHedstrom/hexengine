@@ -82,15 +82,14 @@ function LevelIsland:new(board, data)
         for q,r,height in heightMap:iterator() do
             local tile = nil
             if height <= 0 then 
-                tile = Tile:new(mBoard, q, r, TerrainTypes:getType("Water"), height)
+                tile = mBoard:createTile(q, r, "Water", height)
             elseif height > 4 then 
-                tile = Tile:new(mBoard, q, r, TerrainTypes:getType("Stone"), height)
+                tile = mBoard:createTile(q, r, "Stone", height)
             elseif height == 1 then 
-                tile = Tile:new(mBoard, q, r, TerrainTypes:getType("Desert"), height)
+                tile = mBoard:createTile(q, r, "Desert", height)
             else 
-                tile = Tile:new(mBoard, q, r, TerrainTypes:getType("Plain"), height)
+                tile = mBoard:createTile(q, r, "Plain", height)
             end
-            mBoard:addTile(tile)
             map:set(q,r,{name=tile.terrain.name, elevation=height})
         end
         
@@ -127,8 +126,7 @@ function LevelIsland:new(board, data)
     
     -- Public function generateTile()
     function o:generateTile(q,r)
-        local tile = Tile:new(mBoard, q, r, TerrainTypes:getType("Water"), 0)
-        return tile
+        return mBoard:createTile(q, r, "Water", 0)
     end
 
     if not data:has("map") then
@@ -141,8 +139,7 @@ function LevelIsland:new(board, data)
         map = Map2D:new(data.map)
         for q, r, v in map:iterator() do
             print(q,r,v)
-            local tile = Tile:new(mBoard, q, r, TerrainTypes:getType(v.name), v.elevation)
-            mBoard:addTile(tile)
+            local tile = mBoard:createTile(q, r, v.name, v.elevation)
         end
     end
     

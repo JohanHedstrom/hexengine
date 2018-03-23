@@ -31,8 +31,10 @@ setfenv(1,_P)
 local accessTable = {
     -- getTile(q,r) Returns the Tile under q,r or nil if that coordinate is not part of the Board. 
     getTile = false,
-    -- addTile(tile) Places the provided Tile on the board. 
-    addTile = false,
+    -- Tile createTile(q,r,type,elevation) Creates a tile of the specified type and place it at q,r on the board with the given elevation. 
+    createTile = false,
+    -- bool removeTile(q,r) Removes the tile at q,r. Returns true if a tile was removed.
+    destroyTile = false,
     -- setFocus(Tappable) Sets/unsets a tappable object (implements bool onTap()) that will receive all tap events regardless of where the tap is made. 
     setFocus = false,
     -- The view of the board 
@@ -44,11 +46,15 @@ local accessTable = {
 }
 
 -- Creates a Board which manages tiles, units, etc. The visual representation is managed by the 
--- view which displays part of the board.
+-- view which displays part of the board. Persistent session board state is provided in the state
+-- object. Board state will either be restored or initialized.
 function Board:new(view, state)
     local o = {}
     
     o.view = view
+
+    -- The proxy that expose the API
+    local proxy = {}
     
     -- Allow a hex to undershoot a maximum of one hex height. Needed so that tiles above transparent tiles 
     -- (water for instance) aren't flagged as no longer visible when in fact they are still visible because 
@@ -73,15 +79,22 @@ function Board:new(view, state)
         local tile = mTiles:get(q,r)
         if tile == nil and mMapGenerator ~= nil then
             tile = mMapGenerator:generateTile(q,r)
-            if tile ~= nil then
-                mTiles:set(q,r,tile)
-            end
         end
         return tile
     end
 
-    function o:addTile(tile)
-        if tile == nil then return end
+    function o:createTile(q,r,terrainType,elevation)
+		if type(q) ~= "number" then error("q is of invalid type " .. type(q), 2) end 
+		if type(r) ~= "number" then error("r is of invalid type " .. type(r), 2) end 
+		if type(terrainType) ~= "string" then error("terrainType is of invalid type " .. type(terrainType), 2) end 
+        if elevation == nil then elevation = 0 end
+
+        local terrain = TerrainTypes:getType(terrainType);
+        if terrain == nil then error("Terrain type " .. type(name) .. " doesn't exist.", 2) end
+
+        local tile = Tile:new(proxy, q, r, terrain, elevation)
+        if tile == nil then error("Failed to create tile.", 2) end
+        
         -- TODO: handle replaced tiles correctly
         mTiles:set(tile.q, tile.r, tile)
         
@@ -93,6 +106,8 @@ function Board:new(view, state)
             -- (*-1 because elevation pixels are actually negative)
             view:setMaxTileOvershoot(Tile:getElevationPixels(mMaxElevationLevel)*-1 + view.hexHeight)
         end
+        
+        return tile
     end
     
     function o:setMapGenerator(generator)
@@ -142,7 +157,6 @@ function Board:new(view, state)
     view:setVisibilityHandler(o)
     
     -- Return proxy that enforce access only to public members and methods
-    local proxy = {}
     setmetatable(proxy, {
         __index = function(t,k) 
             if accessTable[k] ~= nil
