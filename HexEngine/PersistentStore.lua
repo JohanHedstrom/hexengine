@@ -55,6 +55,8 @@ local accessTableGroup = {
     getValueCount = false,
     -- getValuePairs() Returns the result of the pairs() function for the values table. Sub-groups are not included.
     valuePairs = false,
+    -- getGroupPairs() Returns the result of the pairs() function for the groups table. Values are not included.
+    groupPairs = false,
 }
 
 local function to_safe_json(str)
@@ -131,7 +133,7 @@ local function createGroup(db, name, parent, isDynamic)
 			return false
 		end
 		
-        print("Added value "..mFullName.."."..name.."="..value)
+        print("Added value "..mFullName.."."..name, value)
         
 		-- Add the leaf
 		mLeafs[name] = value
@@ -182,13 +184,17 @@ local function createGroup(db, name, parent, isDynamic)
             local sql_statement = ""
             
             -- Persist all dirty values
+            local newSize = 0
+            local updateSize = 0
             for k,v in pairs(mDirtySet) do
                 local value = mLeafs[k]
                 if v == "C" then 
                     sql_statement = sql_statement..[[INSERT INTO ]]..mFullName..[[ VALUES(']]..k..[[', ']]..to_safe_json(value)..[[');]] 
+                    newSize = newSize + 1
                 elseif v == "U" then 
                     sql_statement = sql_statement..[[UPDATE ]]..mFullName..[[ SET value=']]..to_safe_json(value)..[[' WHERE name=']]..k..[[';]] 
                     --print("Updated "..mFullName.."."..k.." with value \""..json.encode(value).."\"")
+                updateSize = updateSize + 1
                 else error("Unsupported dirty type "..v) end
             end
 
@@ -199,7 +205,7 @@ local function createGroup(db, name, parent, isDynamic)
     --			print(row.name, row.value)
     --		end
             mDirtySet = {}
-            print("Persisted group "..mFullName)
+            print("Persisted group "..mFullName.." Created: "..newSize.." Updated: "..updateSize )
         end    
 	end
     
@@ -217,6 +223,10 @@ local function createGroup(db, name, parent, isDynamic)
 
     function o:valuePairs()
         return pairs(mLeafs)
+    end
+
+    function o:groupPairs()
+        return pairs(mGroups)
     end
 	
 	-- Marks a leaf dirty (called by the leaf, not part of the public interface)
@@ -242,7 +252,7 @@ local function createGroup(db, name, parent, isDynamic)
 				local subGroup = createGroup(db,groupName,o,dyn)
 				mGroups[groupName] = subGroup
 			else
-				print("Restored leaf "..mFullName.."."..name.." to value "..row.value)
+				--print("Restored leaf "..mFullName.."."..name.." to value "..row.value)
 				mLeafs[name] = from_safe_json(row.value)
                 mLeafCount = mLeafCount + 1
 			end
@@ -282,10 +292,13 @@ local function createGroup(db, name, parent, isDynamic)
                 --print("dynamically created value", k, v, "in group " .. mFullName)
 			elseif (leafValue ~= nil) then
 				mLeafs[k] = v
-				mDirtySet[k] = "U"
-                print("Updated value " .. k .. "=" .. (v or "nil") .. " in Group " .. mFullName)
+                -- Make sure a "C" value isn't overwritten with a "U"
+                if mDirtySet[k] == nil then
+                    mDirtySet[k] = "U"
+                end
+                --print(mFullName, "Updated value " .. k, v)
             else
-                error("Attempt to set key " .. k .. "=" .. (v or "nil") .. " in Group " .. mFullName, 2)
+                error("Attempt to set key " .. k .. " in Group " .. mFullName, 2)
             end
         end })
     return proxy, (not exists)
@@ -331,7 +344,7 @@ local function test()
 			graphics:addValue("effects", false)
 		store:addValue("compound", {str="it's a problem", kalle=42, sune={var1=1, var2=2}})	
 		local dynamic = store:addGroup("dynamic", true)
-		store:save()
+		--store:save()
 	else
 		print("Restored test store from db")
 	end
