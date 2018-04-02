@@ -42,8 +42,14 @@ local accessTable = {
 
 
 -- Creates a Unit
-function Unit:new(board, unitType)
+function Unit:new(board, unitType, unitID, state)
     local o = {}
+  
+    -- The board
+    local mBoard = board
+  
+    -- The unit persistent state
+    local mState = state
     
     -- The unit type
     local mType = unitType
@@ -56,6 +62,22 @@ function Unit:new(board, unitType)
 
     -- The Map2D with info of the selected tiles. The info obj: {movementCost:0}
     local mSelection = nil
+
+    -- The returned proxy object
+    local proxy = {}
+    
+    local function restoreState()
+        if not mState:has("q") then
+            print("Initializing unit "..unitID.."...")
+            mState:addValue("q", 0)
+            mState:addValue("r", 0)
+        else
+            print("Restoring unit "..unitID.." to tile "..mState.q ..",".. mState.r .."...")
+            mTile = mBoard:getTile(mState.q,mState.r)
+            if mTile == nil then error("Failed to restore unit "..unitID..". No tile at provided coordinate.", 2) end
+            mTile:setUnit(proxy)
+        end
+    end
     
     -- Selects the tiles this unit can move to or attack, including the tile the unit is standing on.
     function o:selectReachableTiles()
@@ -146,19 +168,15 @@ function Unit:new(board, unitType)
     end
     
     function o:moveTo(tile)
-        if mTile ~= nil then mTile:setUnit(nil) end
+        if tile == nil then error("Failed to move unit. Not legal to move to nil tile.", 2) end 
     
         mTile = tile
-        if tile ~= nil then 
-            tile:setUnit(self) 
-        else
-            -- If moved from the board then destroy the UI (and remove it from the stage)
-            o:destroyUI(true)
-        end
+        tile:setUnit(self)
+        mState.q = tile.q
+        mState.r = tile.r
     end
         
     -- Return proxy that enforce access only to public members and methods
-    local proxy = {}
     setmetatable(proxy, {
         __index = function(t,k) 
             if accessTable[k] ~= nil
@@ -174,6 +192,9 @@ function Unit:new(board, unitType)
                 error("Attempt to set key " .. k .. "=" .. v .. " in instance of type " .. "Unit", 2)
             end
         end })
+
+    restoreState()
+
     return proxy
 end
 

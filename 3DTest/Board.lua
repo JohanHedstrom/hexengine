@@ -19,6 +19,9 @@ local string = string
 local display = display
 local math = math
 
+-- Used to generate unique names for all created units
+local unitCounter = 0
+
 -- Forbid access of all other globals
 local _P = {}
 setmetatable(_P, {
@@ -35,6 +38,8 @@ local accessTable = {
     createTile = false,
     -- bool removeTile(q,r) Removes the tile at q,r. Returns true if a tile was removed.
     destroyTile = false,
+    -- Unit createUnit(q,r,type) Creates a unit of the specified type and place it at q,r on the board.
+    createUnit = false,
     -- setFocus(Tappable) Sets/unsets a tappable object (implements bool onTap()) that will receive all tap events regardless of where the tap is made. 
     setFocus = false,
     -- The view of the board 
@@ -52,7 +57,7 @@ function Board:new(view, state)
     local o = {}
     
     o.view = view
-
+    
     -- The proxy that expose the API
     local proxy = {}
     
@@ -61,8 +66,13 @@ function Board:new(view, state)
     -- of the undershoot.    
     view:setMaxTileUndershoot(view.hexHeight)
     
+    -- The Tile objects currently on the board.
     local mTiles = Map2D:new()
 
+    -- The persistent data required to recreate all the tiles on the board. This is a Map2D backed up by
+    -- the persistent group state.map which contains {name=terrain, elevation=height} objects.
+    local mTilesData = nil;
+    
     -- The object currently in focus (will receive all tap events) or nil
     local mFocus = nil
     
@@ -75,6 +85,35 @@ function Board:new(view, state)
     -- The maximum elevation level of a tile placed so far
     local mMaxElevationLevel = 0
 
+    local function restoreBoardState()
+        -- Restore all board state
+        if not state:has("map") then
+            print("Starting with a clean board state.")
+            state:addGroup("map", true)
+            mTilesData = Map2D:new(state.map)
+            
+            state:addGroup("units")
+        else
+            print("Restoring board tiles...")
+            mTilesData = Map2D:new(state.map)
+            for q, r, v in mTilesData:iterator() do
+                --print(q,r,v)
+                local tile = o:createTile(q, r, v.name, v.elevation, true)
+            end
+
+            print("Restoring units...")
+            for k,unitGroup in state.units:groupPairs() do
+                print("unit: ", k)
+                local i = string.find(k, "_")
+                local unitType = string.sub(k,0,i-1)
+                print(i, unitType)
+
+                local unit = Unit:new(proxy, UnitTypes:getType(unitType), k, unitGroup)
+                unitCounter = unitCounter + 1
+            end
+        end    
+    end
+    
     function o:getTile(q,r)
         local tile = mTiles:get(q,r)
         if tile == nil and mMapGenerator ~= nil then
@@ -83,7 +122,7 @@ function Board:new(view, state)
         return tile
     end
 
-    function o:createTile(q,r,terrainType,elevation)
+    function o:createTile(q,r,terrainType,elevation,suppressPersistance)
 		if type(q) ~= "number" then error("q is of invalid type " .. type(q), 2) end 
 		if type(r) ~= "number" then error("r is of invalid type " .. type(r), 2) end 
 		if type(terrainType) ~= "string" then error("terrainType is of invalid type " .. type(terrainType), 2) end 
@@ -96,6 +135,10 @@ function Board:new(view, state)
         if tile == nil then error("Failed to create tile.", 2) end
         
         -- TODO: handle replaced tiles correctly
+        if suppressPersistance == nil or suppressPersistance == false then
+            --print("Updated tiles data!")
+            mTilesData:set(tile.q, tile.r, {name=tile.terrain.name, elevation=tile.elevationLevel})
+        end
         mTiles:set(tile.q, tile.r, tile)
         
         if tile.elevationLevel > mMaxElevationLevel then
@@ -106,8 +149,24 @@ function Board:new(view, state)
             -- (*-1 because elevation pixels are actually negative)
             view:setMaxTileOvershoot(Tile:getElevationPixels(mMaxElevationLevel)*-1 + view.hexHeight)
         end
-        
+                
         return tile
+    end
+    
+    function o:createUnit(q,r,unitType)
+        -- Generate unique unit id
+        unitCounter = unitCounter + 1
+        local unitID = unitType.."_"..unitCounter
+
+        print("Creating unit "..unitID)
+ 
+        if state.units:has(unitID) then error("Creation of unit "..unitID.." failed. Persisted data already exists!", 2) end
+        local unitState = state.units:addGroup(unitID)
+        local unit = Unit:new(proxy, UnitTypes:getType(unitType), unitID, unitState)
+
+        local tile = o:getTile(q,r)
+        if tile == nil then error("Creation of unit "..unitID.." failed. No tile at provided coordinate.", 2) end
+        unit:moveTo(tile)
     end
     
     function o:setMapGenerator(generator)
@@ -172,7 +231,9 @@ function Board:new(view, state)
                 error("Attempt to set key " .. k .. "=" .. v .. " in instance of type " .. "Board", 2)
             end
         end })
-            
+
+    restoreBoardState()
+        
     return proxy
 end
 

@@ -92,16 +92,16 @@ function ThreeDTest:new(group, width, height)
 		print("Starting new game session.")
         
         session:addValue("level", "Island")
-        session:addGroup("levelData")
-        
-    else
+        session:addGroup("levelData")        
+        session:addGroup("boardData")
+        else
         print("Resuming game session.")
     end
     
     -- The hex view for the Test instance (created after the proxy is created)
     local hexView = HexView.createView(group, width, height, false, 50/math.cos(math.pi/6), 0.8)
     
-    local board = Board:new(hexView)
+    local board = Board:new(hexView, session.boardData)
     
     -- Restore the level (or reinitialize it)
     local levelName = session.level

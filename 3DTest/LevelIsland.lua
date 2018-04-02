@@ -40,9 +40,6 @@ function LevelIsland:new(board, data)
     
     local mBoard = board
 
-    -- The persistent map data.
-    local map = nil;
-    
     local function setup()
                 
         -- Generate heightmap
@@ -90,35 +87,25 @@ function LevelIsland:new(board, data)
             else 
                 tile = mBoard:createTile(q, r, "Plain", height)
             end
-            map:set(q,r,{name=tile.terrain.name, elevation=height})
         end
         
-        local tile = mBoard:getTile(0,0)
-        local unit = Unit:new(mBoard, UnitTypes:getType("LarvaSpear"))
-        unit:moveTo(tile)
+        mBoard:createUnit(0,0,"LarvaSpear")
+        mBoard:createUnit(1,0,"Larva")
+        mBoard:createUnit(-1,0,"Butterfly")
 
-        tile = mBoard:getTile(1,0)
-        unit = Unit:new(mBoard, UnitTypes:getType("Larva"))
-        unit:moveTo(tile)
-
-        tile = mBoard:getTile(-1,0)
-        unit = Unit:new(mBoard, UnitTypes:getType("Butterfly"))
-        unit:moveTo(tile)
-        
         local enemyCount = 0
         while enemyCount < 5 do
             local lq = math.random(11) - 6
             local lr = math.random(11) - 6
             --print(lq, lr)
-            tile = mBoard:getTile(lq,lr)
+            local tile = mBoard:getTile(lq,lr)
             if tile ~= nil and tile:getUnit() == nil and tile.terrain.name ~= "Water" then
                 local r = math.random(10)
                 if(r >= 9) then
-                    unit = Unit:new(mBoard, UnitTypes:getType("SlimeFloating"))
+                    mBoard:createUnit(lq,lr,"SlimeFloating")
                 else
-                    unit = Unit:new(mBoard, UnitTypes:getType("Slime"))
+                    mBoard:createUnit(lq,lr,"Slime")
                 end
-                unit:moveTo(tile)
                 enemyCount = enemyCount + 1
             end
         end   
@@ -129,18 +116,13 @@ function LevelIsland:new(board, data)
         return mBoard:createTile(q, r, "Water", 0)
     end
 
-    if not data:has("map") then
-        print("Creating new Island level.")
-        data:addGroup("map", true)
-        map = Map2D:new(data.map)
+    -- Perform setup if not already done
+    if not data:has("initialized") then 
+        print("Performing Island level setup.")
+        data:addValue("initialized", true)
         setup()
     else
         print("Resuming Island level.")
-        map = Map2D:new(data.map)
-        for q, r, v in map:iterator() do
-            print(q,r,v)
-            local tile = mBoard:createTile(q, r, v.name, v.elevation)
-        end
     end
     
     -- Return proxy that enforce access only to public members and methods
