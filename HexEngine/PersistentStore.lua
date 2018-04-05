@@ -181,7 +181,7 @@ local function createGroup(db, name, parent, isDynamic)
 		for k,v in pairs(mGroups) do v:save() end
     
         if next(mDirtySet) ~= nil then
-            local sql_statement = ""
+            local sql_statement = "BEGIN; "
             
             -- Persist all dirty values
             local newSize = 0
@@ -198,6 +198,8 @@ local function createGroup(db, name, parent, isDynamic)
                 else error("Unsupported dirty type "..v) end
             end
 
+            sql_statement = sql_statement.." COMMIT"
+            
             --print(sql_statement)
             exec(db, sql_statement)
             
