@@ -43,7 +43,7 @@ local accessTable = {
     elevationLevel = false,
     -- setUnit(Unit) Sets/unsets the unit of this tile. Don't call directly, use Unit:move() instead.
     setUnit = false,
-    -- Unit getUnit() Sets/unsets the unit of this tile. Don't call directly, use Unit:move() instead.
+    -- Unit getUnit() Returns the unit on this tile, or nil if there is no unit.
     getUnit = false,
     -- Number getMovementCost(Unit) Returns the movement cost for this tile for the provided unit. 
     -- If the unit can't enter this tile then -1 is returned.
