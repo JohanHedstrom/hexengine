@@ -79,8 +79,8 @@ function Unit:new(board, unitType, unitID, state)
         end
     end
     
-    -- Selects the tiles this unit can move to or attack, including the tile the unit is standing on.
-    function o:selectReachableTiles()
+    -- Selects the tiles this unit can move, including the tile the unit is standing on.
+    local function selectReachableTiles()
         local start = system.getTimer()
         if mTile == nil then mSelection = nil; return end
         
@@ -97,13 +97,13 @@ function Unit:new(board, unitType, unitID, state)
                 local keepGoing = (info == nil)
                 if info ~= nil then
                     -- check if this route is cheaper than the previous
-                    keepGoing = (info.tile:getMovementCost(self) + movementCost) < info.movementCost
+                    keepGoing = (info.tile:getMovementCost(o) + movementCost) < info.movementCost
                 end
                 
                 if keepGoing then
                     local tile = board:getTile(q,r)
                     if tile ~= nil then
-                        local cost = tile:getMovementCost(self) + movementCost
+                        local cost = tile:getMovementCost(o) + movementCost
                         if cost <= movementPoints then
                             selectNeighbors(tile, cost)
                         end
@@ -144,7 +144,7 @@ function Unit:new(board, unitType, unitID, state)
         print(unitType.name .. " tapped at "..q..","..r)
     
         if mSelection == nil then
-            o:selectReachableTiles()
+            selectReachableTiles()
             if mSelection ~= nil then 
                 board:setFocus(self)
             end
@@ -169,7 +169,9 @@ function Unit:new(board, unitType, unitID, state)
     
     function o:moveTo(tile)
         if tile == nil then error("Failed to move unit. Not legal to move to nil tile.", 2) end 
-    
+        
+        if mTile ~= nil then mTile:setUnit(nil) end
+        
         mTile = tile
         tile:setUnit(self)
         mState.q = tile.q
