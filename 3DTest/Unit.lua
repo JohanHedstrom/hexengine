@@ -16,7 +16,7 @@ local string = string
 local display = display
 local table = table
 local system = system
-
+local native = native
 
 -- Forbid access of all other globals
 local _P = {}
@@ -71,6 +71,7 @@ function Unit:new(board, unitType, unitID, state)
             print("Initializing unit "..unitID.."...")
             mState:addValue("q", 0)
             mState:addValue("r", 0)
+            mState:addValue("damage", 0)
         else
             print("Restoring unit "..unitID.." to tile "..mState.q ..",".. mState.r .."...")
             mTile = mBoard:getTile(mState.q,mState.r)
@@ -126,7 +127,13 @@ function Unit:new(board, unitType, unitID, state)
     
         mGroup = display.newGroup()
         local image = ResourceManager:create(unitType.resource);
+
         mGroup:insert(image)
+
+        -- Display hitpoints. Take the image correction factor into account.
+        local hpText = display.newEmbossedText({text=""..(mType.hitpoints - mState.damage).."/"..mType.hitpoints, font=native.systemFontBold, fontSize=25, align="center"})
+        hpText:translate(image.x + mType.displayXOffset, image.y + mType.displayYOffset)
+        mGroup:insert(hpText)
          
         return mGroup
     end

@@ -25,30 +25,45 @@ setfenv(1,_P)
 local unitType = UnitType:new("Slime")
 unitType:setResource("UnitSlime")
 unitType:setMovement(1)
+unitType:setHitpoints(1)
+unitType:setDisplayXOffset(10)
+unitType:setDisplayYOffset(-40)
 types[unitType.name] = unitType;
 
 -------- SlimeFloating
 local unitType = UnitType:new("SlimeFloating")
 unitType:setResource("UnitSlimeFloating")
 unitType:setMovement(2)
+unitType:setHitpoints(2)
+unitType:setDisplayXOffset(0)
+unitType:setDisplayYOffset(-60)
 types[unitType.name] = unitType;
 
 -------- Larva
 local unitType = UnitType:new("Larva")
 unitType:setResource("UnitLarva")
 unitType:setMovement(1)
+unitType:setHitpoints(1)
+unitType:setDisplayXOffset(15)
+unitType:setDisplayYOffset(-38)
 types[unitType.name] = unitType;
 
 -------- LarvaSpear
 local unitType = UnitType:new("LarvaSpear")
 unitType:setResource("UnitLarvaSpear")
 unitType:setMovement(2)
+unitType:setHitpoints(3)
+unitType:setDisplayXOffset(5)
+unitType:setDisplayYOffset(-45)
 types[unitType.name] = unitType;
 
 -------- Butterfly
 local unitType = UnitType:new("Butterfly")
 unitType:setResource("UnitButterfly")
 unitType:setMovement(3)
+unitType:setHitpoints(2)
+unitType:setDisplayXOffset(-25)
+unitType:setDisplayYOffset(-47)
 types[unitType.name] = unitType;
 
 function UnitTypes:getType(name)

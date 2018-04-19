@@ -30,6 +30,15 @@ local accessTable = {
     -- The number of tiles this unit type can move.
     movement = false,
     setMovement = false,
+    -- The number hitpoints a unit have.
+    hitpoints = false,
+    setHitpoints = false,
+    -- The x offset of the unit info display (hitpoints)
+    displayXOffset = false,
+    setDisplayXOffset = false,
+    -- The y offset of the unit info display (hitpoints)
+    displayYOffset = false,
+    setDisplayYOffset = false,
 }
 
 -- Creates a UnitType that belongs to the provided level located at q,r, that is of the provided UnitType type
@@ -40,6 +49,9 @@ function UnitType:new(name)
 	o.name = name
 	o.resource = ""
     o.movement = 0
+    o.hitpoints = 1
+    o.displayXOffset = 0
+    o.displayYOffset = 0
 	    
     function o:setResource(name)
         o.resource = name;
@@ -48,7 +60,19 @@ function UnitType:new(name)
     function o:setMovement(movement)
         o.movement = movement;
     end
-        
+
+    function o:setHitpoints(hp)
+        o.hitpoints = hp;
+    end
+
+    function o:setDisplayXOffset(offset)
+        o.displayXOffset = offset;
+    end
+
+    function o:setDisplayYOffset(offset)
+        o.displayYOffset = offset;
+    end
+    
     -- Return proxy that enforce access only to public members and methods
     local proxy = {}
     setmetatable(proxy, {
